@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#2C2A24">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<title>RACREAA · Acceso</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #FAFAF7;
+  --surface:   #FFFFFF;
+  --surface2:  #F3F1EB;
+  --border:    #E0DDD4;
+  --border2:   #CCC8BC;
+  --text:      #2C2A24;
+  --text2:     #5C5A54;
+  --text3:     #9A9890;
+  --gold:      #B8922A;
+  --gold-lt:   #F5ECD9;
+  --gold-dim:  #8A6C1E;
+  --dark:      #2C2A24;
+  --red:       #B83232;
+  --red-lt:    #FAEAEA;
+  --green:     #2E7D52;
+  --green-lt:  #E6F4EC;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; }
+body {
+  background: var(--bg);
+  font-family: 'Barlow', sans-serif;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── LAYOUT ── */
+.page {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+/* ── PANEL IZQUIERDO — BRANDING ── */
+.panel-brand {
+  background: var(--dark);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px 56px;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel-brand::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 400px; height: 400px;
+  border: 1px solid rgba(184,146,42,.1);
+  border-radius: 50%;
+}
+.panel-brand::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: -80px;
+  width: 300px; height: 300px;
+  border: 1px solid rgba(184,146,42,.08);
+  border-radius: 50%;
+}
+
+.brand-top { position: relative; z-index: 1; }
+
+.brand-wordmark {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: 8px;
+  color: var(--gold);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.brand-tagline {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,.3);
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+.brand-mid {
+  position: relative;
+  z-index: 1;
+}
+
+.brand-headline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 42px;
+  line-height: 1.1;
+  color: #FFFFFF;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.brand-headline em {
+  font-style: normal;
+  color: var(--gold);
+}
+
+.brand-desc {
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(255,255,255,.45);
+  max-width: 320px;
+}
+
+.brand-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.pill {
+  background: rgba(184,146,42,.1);
+  border: 1px solid rgba(184,146,42,.2);
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+}
+
+.brand-bottom {
+  position: relative;
+  z-index: 1;
+  font-size: 9px;
+  color: rgba(255,255,255,.2);
+  letter-spacing: 1px;
+}
+
+/* ── PANEL DERECHO — FORMULARIO ── */
+.panel-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 56px;
+  background: var(--surface);
+}
+
+.form-wrap {
+  width: 100%;
+  max-width: 380px;
+}
+
+.form-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: var(--text);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.form-sub {
+  font-size: 12px;
+  color: var(--text3);
+  letter-spacing: 1px;
+  margin-top: 6px;
+}
+
+.divider {
+  height: 2px;
+  background: var(--gold);
+  width: 40px;
+  margin: 20px 0;
+}
+
+/* Tenant badge (se inyecta por JS según query param) */
+.tenant-badge {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: var(--gold-lt);
+  border: 1px solid var(--gold);
+  padding: 10px 14px;
+  margin-bottom: 20px;
+}
+.tenant-badge.visible { display: flex; }
+.tenant-logo { max-height: 28px; max-width: 80px; object-fit:contain; }
+.tenant-info .t-name { font-size: 12px; font-weight: 600; color: var(--text); }
+.tenant-info .t-slug { font-size: 9px; letter-spacing: 2px; color: var(--gold-dim); text-transform: uppercase; }
+
+/* Campos */
+.field {
+  margin-bottom: 16px;
+}
+
+.field-label {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.field-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 11px 14px;
+  outline: none;
+  transition: border-color .2s;
+  -webkit-appearance: none;
+}
+.field-input:focus    { border-color: var(--gold); }
+.field-input.error    { border-color: var(--red); }
+.field-input::placeholder { color: var(--text3); font-weight: 400; }
+
+.field-hint {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 4px;
+  display: block;
+}
+
+.field-error {
+  font-size: 10px;
+  color: var(--red);
+  margin-top: 4px;
+  display: none;
+}
+.field-error.visible { display: block; }
+
+/* Alerta global */
+.alert {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  margin-bottom: 16px;
+  display: none;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.5;
+}
+.alert.visible { display: flex; }
+.alert.error   { background: var(--red-lt);   border-color: var(--red);   color: var(--red); }
+.alert.success { background: var(--green-lt); border-color: var(--green); color: var(--green); }
+.alert.warning { background: var(--gold-lt);  border-color: var(--gold);  color: var(--gold-dim); }
+
+/* Botón submit */
+.btn-submit {
+  width: 100%;
+  background: var(--gold);
+  border: 1px solid var(--gold);
+  color: var(--surface);
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 13px;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-submit:hover:not(:disabled) { background: var(--gold-dim); border-color: var(--gold-dim); }
+.btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .5s linear infinite;
+  display: none;
+}
+.spinner.visible { display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Intentos restantes */
+.attempts-indicator {
+  display: none;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 12px;
+}
+.attempts-indicator.visible { display: flex; }
+.att-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border2);
+  transition: background .3s;
+}
+.att-dot.used { background: var(--red); }
+
+.form-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .page { grid-template-columns: 1fr; }
+  .panel-brand { display: none; }
+  .panel-form { padding: 40px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- PANEL BRANDING -->
+  <div class="panel-brand">
+    <div class="brand-top">
+      <div class="brand-wordmark">DMZ</div>
+      <div class="brand-tagline">Kitchen Support · RACREAA Platform</div>
+    </div>
+
+    <div class="brand-mid">
+      <div class="brand-headline">
+        Control<br>operativo<br><em>sin concesiones</em>
+      </div>
+      <p class="brand-desc">
+        Plataforma SaaS B2B de auditoría operativa para la industria de alimentos y bebidas. Evidencia incorruptible, trazabilidad permanente.
+      </p>
+      <div class="brand-pills">
+        <span class="pill">Zero-Trust</span>
+        <span class="pill">Multi-Tenant</span>
+        <span class="pill">GPS Verificado</span>
+        <span class="pill">Audit Trail</span>
+        <span class="pill">ISO 22000</span>
+      </div>
+    </div>
+
+    <div class="brand-bottom">
+      &copy; 2026 De La Mora Zumar&aacute;n Kitchen Support &mdash; Confidencial
+    </div>
+  </div>
+
+  <!-- PANEL FORMULARIO -->
+  <div class="panel-form">
+    <div class="form-wrap">
+
+      <!-- Tenant badge (se muestra si ?tenant=slug en la URL) -->
+      <div class="tenant-badge" id="tenant-badge">
+        <img class="tenant-logo" id="tenant-logo" src="" alt="">
+        <div class="tenant-info">
+          <div class="t-name" id="tenant-name">—</div>
+          <div class="t-slug" id="tenant-slug">—</div>
+        </div>
+      </div>
+
+      <div class="form-title">Acceso</div>
+      <div class="form-sub">Ingrese sus credenciales de operador</div>
+      <div class="divider"></div>
+
+      <div class="alert" id="alert" role="alert"></div>
+
+      <!-- Campo: Organización -->
+      <div class="field">
+        <label class="field-label" for="f-tenant">Organización (slug)</label>
+        <input class="field-input" id="f-tenant" type="text"
+               placeholder="ej. nook-aruba"
+               autocomplete="organization"
+               autocapitalize="none"
+               spellcheck="false">
+        <span class="field-error" id="err-tenant">Ingrese el identificador de su organización.</span>
+      </div>
+
+      <!-- Campo: Email -->
+      <div class="field">
+        <label class="field-label" for="f-email">Correo electrónico</label>
+        <input class="field-input" id="f-email" type="email"
+               placeholder="auditor@empresa.com"
+               autocomplete="email"
+               autocapitalize="none"
+               spellcheck="false">
+        <span class="field-error" id="err-email">Ingrese un correo electrónico válido.</span>
+      </div>
+
+      <!-- Campo: Contraseña -->
+      <div class="field">
+        <label class="field-label" for="f-pass">Contraseña</label>
+        <input class="field-input" id="f-pass" type="password"
+               placeholder="••••••••"
+               autocomplete="current-password">
+        <span class="field-error" id="err-pass">Ingrese su contraseña.</span>
+      </div>
+
+      <button class="btn-submit" id="btn-submit" onclick="doLogin()">
+        <div class="spinner" id="spinner"></div>
+        <span id="btn-label">Ingresar</span>
+      </button>
+
+      <!-- Indicador de intentos restantes -->
+      <div class="attempts-indicator" id="attempts-indicator">
+        <div class="att-dot" id="att-1"></div>
+        <div class="att-dot" id="att-2"></div>
+        <div class="att-dot" id="att-3"></div>
+        <div class="att-dot" id="att-4"></div>
+        <div class="att-dot" id="att-5"></div>
+      </div>
+
+      <div class="form-footer">
+        RACREAA &mdash; Plataforma segura &mdash; TLS 1.3
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── Seguridad básica client-side ── */
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+/* ── Leer tenant desde URL ── */
+(function loadTenantFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const slug   = params.get('tenant');
+  if (!slug) return;
+
+  document.getElementById('f-tenant').value = slug;
+
+  // Precargar branding del tenant
+  fetch(`/api/tenant/${encodeURIComponent(slug)}/branding`)
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data) return;
+      const badge = document.getElementById('tenant-badge');
+      badge.classList.add('visible');
+      document.getElementById('tenant-name').textContent = data.name    || slug;
+      document.getElementById('tenant-slug').textContent = slug;
+      if (data.logoUrl) {
+        const img = document.getElementById('tenant-logo');
+        img.src = data.logoUrl;
+        img.style.display = 'block';
+      }
+    })
+    .catch(() => {});
+})();
+
+/* ── Validaciones ── */
+function validateForm() {
+  let valid = true;
+
+  const tenant = document.getElementById('f-tenant').value.trim();
+  const email  = document.getElementById('f-email').value.trim();
+  const pass   = document.getElementById('f-pass').value;
+
+  // Tenant
+  const errT = document.getElementById('err-tenant');
+  if (!tenant || !/^[a-z0-9-]{2,64}$/.test(tenant)) {
+    document.getElementById('f-tenant').classList.add('error');
+    errT.classList.add('visible'); valid = false;
+  } else {
+    document.getElementById('f-tenant').classList.remove('error');
+    errT.classList.remove('visible');
+  }
+
+  // Email
+  const errE = document.getElementById('err-email');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('f-email').classList.add('error');
+    errE.classList.add('visible'); valid = false;
+  } else {
+    document.getElementById('f-email').classList.remove('error');
+    errE.classList.remove('visible');
+  }
+
+  // Password
+  const errP = document.getElementById('err-pass');
+  if (!pass || pass.length < 8) {
+    document.getElementById('f-pass').classList.add('error');
+    errP.classList.add('visible'); valid = false;
+  } else {
+    document.getElementById('f-pass').classList.remove('error');
+    errP.classList.remove('visible');
+  }
+
+  return valid;
+}
+
+/* ── Indicador de intentos ── */
+let failedAttempts = 0;
+function updateAttemptDots(remaining) {
+  const used = 5 - Math.max(0, Math.min(5, remaining));
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById(`att-${i}`).classList.toggle('used', i <= used);
+  }
+  if (used > 0) document.getElementById('attempts-indicator').classList.add('visible');
+}
+
+/* ── Mostrar alerta ── */
+function showAlert(type, msg) {
+  const el = document.getElementById('alert');
+  el.className = `alert visible ${type}`;
+  el.textContent = msg;
+}
+
+function hideAlert() {
+  document.getElementById('alert').className = 'alert';
+}
+
+/* ── Login ── */
+async function doLogin() {
+  hideAlert();
+  if (!validateForm()) return;
+
+  const btn     = document.getElementById('btn-submit');
+  const spinner = document.getElementById('spinner');
+  const label   = document.getElementById('btn-label');
+
+  btn.disabled         = true;
+  spinner.classList.add('visible');
+  label.textContent    = 'Verificando...';
+
+  const body = {
+    tenant_slug: document.getElementById('f-tenant').value.trim().toLowerCase(),
+    email:       document.getElementById('f-email').value.trim().toLowerCase(),
+    password:    document.getElementById('f-pass').value,
+  };
+
+  try {
+    const res  = await fetch('/api/auth/login', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json', 'X-Request-ID': 'REQ-' + Date.now().toString(36).toUpperCase() },
+      body:        JSON.stringify(body),
+      credentials: 'include',  // enviar/recibir cookies HttpOnly
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      // Guardar access token en memoria (sessionStorage — nunca localStorage para tokens)
+      sessionStorage.setItem('racreaa_at', data.access_token);
+      sessionStorage.setItem('racreaa_op', JSON.stringify(data.operator));
+      sessionStorage.setItem('racreaa_tenant', JSON.stringify(data.tenant));
+
+      showAlert('success', `Bienvenido, ${data.operator.full_name}. Redirigiendo...`);
+      label.textContent = 'Accediendo...';
+
+      // Redirigir al módulo principal
+      setTimeout(() => {
+        const redirect = new URLSearchParams(window.location.search).get('redirect') || '/audit';
+        window.location.href = redirect + `?tenant=${data.tenant.slug}`;
+      }, 800);
+
+    } else if (res.status === 429) {
+      showAlert('error', data.message || 'Demasiados intentos. Intente en 30 minutos.');
+      updateAttemptDots(0);
+      btn.disabled = true; // mantener deshabilitado
+      label.textContent = 'Bloqueado';
+      spinner.classList.remove('visible');
+
+    } else {
+      failedAttempts++;
+      if (data.remaining !== undefined) updateAttemptDots(data.remaining);
+      showAlert('error', data.message || 'Credenciales incorrectas.');
+      document.getElementById('f-pass').value = '';
+      document.getElementById('f-pass').focus();
+      btn.disabled = false;
+      spinner.classList.remove('visible');
+      label.textContent = 'Ingresar';
+    }
+
+  } catch (err) {
+    showAlert('error', 'Error de red. Verifique su conexión e intente nuevamente.');
+    btn.disabled = false;
+    spinner.classList.remove('visible');
+    label.textContent = 'Ingresar';
+  }
+}
+
+/* ── Submit con Enter ── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+/* ── Auto-refresh del access token ── */
+(function initTokenRefresh() {
+  const at = sessionStorage.getItem('racreaa_at');
+  if (!at) return;
+  // Si hay un token guardado, intentar refrescarlo silenciosamente
+  // en páginas subsecuentes (el login.html normalmente no tiene token aún)
+})();
+</script>
+
+</body>
+</html>
