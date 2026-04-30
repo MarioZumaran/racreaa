@@ -48,3 +48,5 @@ npx vercel --prod
 ---
 
 *Confidencial — De La Mora Zumarán Kitchen Support © 2026*
+
+<!-- deploy: 2026-04-30T16:47:56Z -->
