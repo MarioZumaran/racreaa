@@ -3,7 +3,8 @@
   "regions": ["iad1"],
   "functions": {
     "api/*.js": { "maxDuration": 30 },
-    "api/auth/*.js": { "maxDuration": 30 }
+    "api/auth/*.js": { "maxDuration": 30 },
+    "api/tenant/*.js": { "maxDuration": 30 }
   },
   "headers": [
     {
@@ -15,5 +16,8 @@
         { "key": "Referrer-Policy", "value": "no-referrer" }
       ]
     }
+  ],
+  "rewrites": [
+    { "source": "/logo-dmz.jpg", "destination": "/public/logo-dmz.jpg" }
   ]
 }

@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#2C2A24">
 <meta http-equiv="X-Frame-Options" content="DENY">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
-<title>RACREAA · Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@600;700;900&display=swap" rel="stylesheet">
+<title>DMZ Audit · Dashboard · dmzkitchensupportaudit.com</title>
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@200;300;400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
 /* ── SECURITY ── */
 * { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
@@ -24,7 +24,7 @@ input,textarea,[contenteditable] { -webkit-user-select:text; user-select:text; }
   --text:     #2C2A24;
   --text2:    #5C5A54;
   --text3:    #9A9890;
-  --gold:     #B8922A;
+  --gold:     #C4922A;
   --gold-lt:  #F5ECD9;
   --gold-dim: #8A6C1E;
   --dark:     #2C2A24;
@@ -37,7 +37,7 @@ input,textarea,[contenteditable] { -webkit-user-select:text; user-select:text; }
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;}
-body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);display:flex;flex-direction:column;min-height:100vh;font-size:14px;}
+body{background:var(--bg);font-family:'Urbanist',sans-serif;color:var(--text);display:flex;flex-direction:column;min-height:100vh;font-size:14px;}
 
 /* ── TOPBAR ── */
 .topbar {
@@ -478,10 +478,10 @@ body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);disp
 .card-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:26px;color:var(--border2);line-height:1;min-width:30px;margin-top:2px;}
 .card-fields{flex:1;display:flex;flex-direction:column;gap:7px;}
 .field-row{display:flex;gap:8px;}
-.f-name{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:12px;font-weight:600;padding:6px 9px;flex:1;outline:none;transition:border-color .2s;-webkit-user-select:text;user-select:text;}
+.f-name{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Urbanist',sans-serif;font-size:12px;font-weight:600;padding:6px 9px;flex:1;outline:none;transition:border-color .2s;-webkit-user-select:text;user-select:text;}
 .f-name:focus{border-color:var(--gold);}
 .f-name::placeholder{color:var(--text3);font-weight:400;}
-.f-cat{background:var(--bg);border:1px solid var(--border);color:var(--text2);font-family:'Barlow',sans-serif;font-size:11px;padding:6px 24px 6px 9px;outline:none;width:130px;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239A9890'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-color:var(--bg);}
+.f-cat{background:var(--bg);border:1px solid var(--border);color:var(--text2);font-family:'Urbanist',sans-serif;font-size:11px;padding:6px 24px 6px 9px;outline:none;width:130px;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239A9890'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-color:var(--bg);}
 .criterios{display:flex;flex-direction:column;gap:6px;}
 .criterio-row{display:flex;align-items:center;gap:8px;}
 .crit-label{font-size:10px;color:var(--text3);width:96px;flex-shrink:0;}
@@ -493,7 +493,7 @@ body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);disp
 .score-bar-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .3s;}
 .crit-score{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;color:var(--text3);min-width:12px;text-align:right;}
 .card-footer{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
-.card-obs{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:11px;padding:6px 9px;flex:1;outline:none;resize:none;height:40px;line-height:1.5;transition:border-color .2s;-webkit-user-select:text;user-select:text;}
+.card-obs{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Urbanist',sans-serif;font-size:11px;padding:6px 9px;flex:1;outline:none;resize:none;height:40px;line-height:1.5;transition:border-color .2s;-webkit-user-select:text;user-select:text;}
 .card-obs::placeholder{color:var(--text3);}
 .card-total{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;}
 .total-ring{width:46px;height:46px;border-radius:50%;border:2px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color .3s;}
@@ -502,7 +502,7 @@ body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);disp
 .nivel-tag{font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;background:var(--surface2);color:var(--text3);transition:background .3s,color .3s;}
 .btn-del{position:absolute;top:8px;right:8px;background:transparent;border:none;color:var(--border2);font-size:16px;line-height:1;cursor:pointer;padding:2px 5px;transition:color .2s;}
 .btn-del:hover{color:var(--red);}
-.btn-capture{display:flex;align-items:center;gap:5px;background:var(--surface2);border:1px dashed var(--border2);color:var(--text2);font-family:'Barlow',sans-serif;font-size:9px;font-weight:600;letter-spacing:1px;padding:5px 10px;cursor:pointer;text-transform:uppercase;transition:all .2s;margin-top:6px;}
+.btn-capture{display:flex;align-items:center;gap:5px;background:var(--surface2);border:1px dashed var(--border2);color:var(--text2);font-family:'Urbanist',sans-serif;font-size:9px;font-weight:600;letter-spacing:1px;padding:5px 10px;cursor:pointer;text-transform:uppercase;transition:all .2s;margin-top:6px;}
 .btn-capture:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-lt);}
 .evidence-zone{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .evidence-thumb{position:relative;width:60px;height:60px;border:1px solid var(--border);overflow:hidden;flex-shrink:0;}
@@ -538,20 +538,20 @@ body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);disp
 .cs-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;color:var(--gold-dim);min-width:26px;text-align:right;}
 .cs-bw{width:60px;height:2px;background:var(--surface2);}
 .cs-bf{height:100%;background:var(--gold);transition:width .4s;}
-.concl{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:11px;line-height:1.6;padding:9px 11px;width:100%;outline:none;resize:none;height:80px;transition:border-color .2s;-webkit-user-select:text;user-select:text;}
+.concl{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Urbanist',sans-serif;font-size:11px;line-height:1.6;padding:9px 11px;width:100%;outline:none;resize:none;height:80px;transition:border-color .2s;-webkit-user-select:text;user-select:text;}
 .concl:focus{border-color:var(--gold);}
 .concl::placeholder{color:var(--text3);}
 .firmas{display:flex;gap:10px;margin-top:12px;}
 .firma{flex:1;border-top:1px solid var(--text3);padding-top:5px;}
 .firma-lbl{font-size:7px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;}
-.firma-inp{background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:10px;padding:2px 0;width:100%;outline:none;margin-top:3px;-webkit-user-select:text;user-select:text;}
+.firma-inp{background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Urbanist',sans-serif;font-size:10px;padding:2px 0;width:100%;outline:none;margin-top:3px;-webkit-user-select:text;user-select:text;}
 .firma-inp::placeholder{color:var(--text3);}
 .sig-wrap{margin-top:8px;border:1px solid var(--border);background:var(--bg);}
 .sig-canvas{display:block;width:100%;height:64px;cursor:crosshair;touch-action:none;}
 .sig-actions{display:flex;justify-content:flex-end;padding:3px 7px;border-top:1px solid var(--border);}
-.sig-btn{background:transparent;border:none;color:var(--text3);font-size:8px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;padding:2px 5px;font-family:'Barlow',sans-serif;font-weight:600;}
+.sig-btn{background:transparent;border:none;color:var(--text3);font-size:8px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;padding:2px 5px;font-family:'Urbanist',sans-serif;font-weight:600;}
 .sig-btn:hover{color:var(--gold);}
-.btn-act{display:block;width:100%;padding:10px;font-family:'Barlow',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:7px;transition:all .2s;}
+.btn-act{display:block;width:100%;padding:10px;font-family:'Urbanist',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:7px;transition:all .2s;}
 .btn-act.solid{background:var(--gold);border:1px solid var(--gold);color:var(--surface);}
 .btn-act.solid:hover{background:var(--gold-dim);}
 .btn-act.outline{background:transparent;border:1px solid var(--border2);color:var(--text2);}
@@ -894,10 +894,13 @@ body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);disp
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <div class="topbar-brand">
+  <div class="topbar-brand" style="width:auto;padding:0 20px;gap:12px;">
+    <div style="width:40px;height:40px;border-radius:50%;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <img src="/logo-dmz.jpg" alt="DMZ" style="width:36px;height:36px;object-fit:cover;border-radius:50%;">
+    </div>
     <div>
-      <div class="tb-logo">DMZ</div>
-      <div class="tb-sub">RACREAA</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;line-height:1">DMZ AUDIT</div>
+      <div style="font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.25);text-transform:uppercase;margin-top:3px">dmzkitchensupportaudit.com</div>
     </div>
   </div>
   <div class="topbar-center">
@@ -971,7 +974,7 @@ body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);disp
   <div class="sidebar-footer">
     <div class="sf-label">Tenant</div>
     <div class="sf-val" id="sf-tenant">—</div>
-    <div class="sf-label" style="margin-top:8px">Sesión</div>
+    <div class="sf-label" style="margin-top:8px">dmzkitchensupportaudit.com</div>
     <div class="sf-val" id="sf-session">—</div>
   </div>
 </div>
@@ -1055,7 +1058,7 @@ body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);disp
         <div class="page-header">
           <div>
             <div class="page-title">Nueva Evaluación</div>
-            <div class="page-sub">Calificación de Alimentos · RACREAA</div>
+            <div class="page-sub">Calificación de Alimentos · DMZ Audit</div>
           </div>
           <button class="btn-add-eval" onclick="addCard()">+ Agregar platillo</button>
         </div>
