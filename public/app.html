@@ -48,7 +48,7 @@
 *:not(input):not(textarea):not(select) { -webkit-user-select:none; user-select:none; }
 input,textarea,select { -webkit-user-select:text; user-select:text; }
 html,body { height:100%; overflow:hidden; }
-body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); font-size:15px; }
+body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); font-size:17px; }
 
 /* ══ TOPBAR MÓVIL ══ */
 .topbar {
@@ -153,7 +153,7 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
 }
 .nav-btn.active { color: var(--gold); }
 .nav-btn svg { width: 20px; height: 20px; }
-.nav-label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+.nav-label { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
 .nav-badge {
   position: absolute;
   top: 6px; right: calc(50% - 16px);
@@ -194,12 +194,12 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
 .page-title {
   font-family: 'Morl', sans-serif;
   font-weight: 900;
-  font-size: 22px;
+  font-size: 26px;
   letter-spacing: 2px;
   color: var(--text);
   text-transform: uppercase;
 }
-.page-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.page-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
 
 /* Botón primario mobile */
 .btn-primary {
@@ -207,10 +207,10 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
   border: none;
   color: #fff;
   font-family: 'Morl', sans-serif;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 1px;
-  padding: 12px 20px;
+  padding: 15px 20px;
   cursor: pointer;
   border-radius: 2px;
   width: 100%;
@@ -224,9 +224,9 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
   border: 1px solid var(--b2);
   color: var(--text2);
   font-family: 'Morl', sans-serif;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
-  padding: 10px 16px;
+  padding: 13px 16px;
   cursor: pointer;
   width: 100%;
   margin-top: 8px;
@@ -242,7 +242,7 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
   position: relative;
 }
 .card-label {
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 2px;
   color: var(--text3);
   text-transform: uppercase;
@@ -263,14 +263,14 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
 
 /* Fields */
 .field { margin-bottom: 14px; }
-.field-label { font-size: 9px; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; display: block; margin-bottom: 5px; }
+.field-label { font-size: 11px; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; display: block; margin-bottom: 5px; }
 .field-input {
   background: var(--s2);
   border: 1px solid var(--border);
   color: var(--text);
   font-family: 'Morl', sans-serif;
-  font-size: 15px;
-  padding: 12px 14px;
+  font-size: 17px;
+  padding: 13px 14px;
   width: 100%;
   outline: none;
   border-radius: 2px;
@@ -282,7 +282,7 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
 
 /* Seccion label */
 .section-lbl {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 3px;
   color: var(--gold-d);
   text-transform: uppercase;
@@ -293,6 +293,23 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
   gap: 8px;
 }
 .section-lbl::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* Timer por platillo */
+.platillo-timer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--dark);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  margin-top: 12px;
+}
+.pt-col { display:flex; flex-direction:column; gap:2px; }
+.pt-label { font-size:9px; letter-spacing:2px; color:rgba(255,255,255,.35); text-transform:uppercase; }
+.pt-val { font-family:'Morl',sans-serif; font-weight:700; font-size:16px; color:var(--gold); letter-spacing:1px; line-height:1; }
+.pt-val.muted { color:rgba(255,255,255,.3); }
+.pt-dur { font-family:'Morl',sans-serif; font-weight:700; font-size:22px; color:#fff; letter-spacing:2px; text-align:center; }
+.pt-dur-lbl { font-size:8px; letter-spacing:2px; color:rgba(255,255,255,.35); text-transform:uppercase; text-align:center; margin-top:1px; }
 
 /* ══ PLATILLO CARD MÓVIL ══ */
 .platillo-card-m {
@@ -359,8 +376,8 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
   border: 1px solid var(--border);
   color: var(--text);
   font-family: 'Morl', sans-serif;
-  font-size: 14px;
-  padding: 10px 12px;
+  font-size: 17px;
+  padding: 12px 12px;
   flex: 1;
   outline: none;
   -webkit-appearance: none;
@@ -371,9 +388,9 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
   border: 1px solid var(--border);
   color: var(--text2);
   font-family: 'Morl', sans-serif;
-  font-size: 13px;
-  padding: 10px 12px;
-  width: 140px;
+  font-size: 16px;
+  padding: 12px 12px;
+  width: 150px;
   outline: none;
   -webkit-appearance: none;
   cursor: pointer;
@@ -381,10 +398,10 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
 
 /* Estrellas grandes para touch */
 .crit-block { margin-bottom: 10px; }
-.crit-name { font-size: 10px; letter-spacing: 1px; color: var(--text3); text-transform: uppercase; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+.crit-name { font-size: 13px; letter-spacing: 1px; color: var(--text3); text-transform: uppercase; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
 .stars-row { display: flex; gap: 6px; }
 .star-touch {
-  font-size: 28px;
+  font-size: 34px;
   cursor: pointer;
   color: var(--border);
   -webkit-user-select: none;
@@ -409,7 +426,7 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
   border: 1.5px dashed var(--b2);
   color: var(--text2);
   font-family: 'Morl', sans-serif;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -463,12 +480,12 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
   border: 1px solid var(--border);
   color: var(--text);
   font-family: 'Morl', sans-serif;
-  font-size: 14px;
-  padding: 10px 12px;
+  font-size: 17px;
+  padding: 12px 12px;
   width: 100%;
   outline: none;
   resize: none;
-  height: 72px;
+  height: 80px;
   margin-top: 10px;
   -webkit-user-select: text;
   user-select: text;
@@ -484,7 +501,7 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
   padding-top: 10px;
   border-top: 1px solid var(--border);
 }
-.pc-score-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
+.pc-score-label { font-size: 13px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
 .pc-score-val {
   font-family: 'Morl', sans-serif;
   font-weight: 900;
@@ -492,7 +509,7 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
   line-height: 1;
 }
 .pc-nivel-chip {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -552,7 +569,7 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
 .sheet-title {
   font-family: 'Morl', sans-serif;
   font-weight: 900;
-  font-size: 20px;
+  font-size: 24px;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--text);
@@ -601,7 +618,7 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
 .gps-dot-m.active { background:var(--green); animation:pulse-gps 2s infinite; }
 .gps-dot-m.error  { background:var(--red); }
 @keyframes pulse-gps { 0%,100%{opacity:1}50%{opacity:.3} }
-.gps-text-m { color:var(--text3); letter-spacing:1px; text-transform:uppercase; }
+.gps-text-m { color:var(--text3); letter-spacing:1px; text-transform:uppercase; font-size:12px; }
 .gps-coords-m { color:var(--text2); font-family:monospace; font-size:9px; margin-left:auto; }
 
 /* Tabla historial móvil */
@@ -625,8 +642,8 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
   text-align: center;
 }
 .hi-info { flex: 1; min-width: 0; }
-.hi-name { font-weight: 700; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.hi-meta { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.hi-name { font-weight: 700; font-size: 16px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hi-meta { font-size: 13px; color: var(--text3); margin-top: 2px; }
 .hi-id   { font-size: 9px; color: var(--text3); font-family: monospace; margin-top: 3px; }
 
 /* Spinner */
@@ -1086,6 +1103,21 @@ function addCardM() {
       <svg class="pc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
     <div class="pc-body">
+      <!-- TIMER DEL PLATILLO -->
+      <div class="platillo-timer">
+        <div class="pt-col">
+          <span class="pt-label">Hora inicio</span>
+          <span class="pt-val muted" id="pt-start-${id}">—</span>
+        </div>
+        <div style="text-align:center;">
+          <div class="pt-dur" id="pt-dur-${id}">—</div>
+          <div class="pt-dur-lbl">Duración</div>
+        </div>
+        <div class="pt-col" style="align-items:flex-end;">
+          <span class="pt-label">Hora fin</span>
+          <span class="pt-val muted" id="pt-end-${id}">—</span>
+        </div>
+      </div>
       <div class="pc-field-row">
         <input class="pc-input" placeholder="Nombre del platillo" oninput="updCardM('${id}','nombre',this.value);document.getElementById('pcn-${id}').textContent=this.value||'Sin nombre'">
         <select class="pc-select" onchange="updCardM('${id}','categoria',this.value);document.getElementById('pcc-${id}').textContent=this.value||'Sin categoría'">
@@ -1114,14 +1146,46 @@ function addCardM() {
     </div>`;
 
   wrap.appendChild(div);
-  // Abrir automáticamente al crear
+  // Abrir automáticamente al crear y marcar hora de inicio
   div.classList.add('open');
+  stampPlatilloStart(id);
   updateFAB();
 }
 
 function toggleCardM(id) {
   const el = document.getElementById(id);
   if (el) el.classList.toggle('open');
+}
+
+/* ══ TIMER POR PLATILLO ══ */
+const platilloTimers = {}; // { cardId: { start: Date, end: Date } }
+
+function stampPlatilloStart(id) {
+  const now = new Date();
+  if (!platilloTimers[id]) platilloTimers[id] = {};
+  platilloTimers[id].start = now;
+  const hhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const el = document.getElementById(`pt-start-${id}`);
+  if (el) { el.textContent = hhmm; el.classList.remove('muted'); el.style.color = 'var(--gold)'; }
+}
+
+function stampPlatilloEnd(id) {
+  const now = new Date();
+  if (!platilloTimers[id]) platilloTimers[id] = {};
+  if (!platilloTimers[id].start) stampPlatilloStart(id);
+  platilloTimers[id].end = now;
+
+  const hhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const endEl = document.getElementById(`pt-end-${id}`);
+  if (endEl) { endEl.textContent = hhmm; endEl.classList.remove('muted'); endEl.style.color = 'rgba(255,255,255,.8)'; }
+
+  // Calcular duración
+  const diffSec = Math.floor((now - platilloTimers[id].start) / 1000);
+  const mm = Math.floor(diffSec / 60);
+  const ss = diffSec % 60;
+  const dur = mm > 0 ? `${mm}m ${ss}s` : `${ss}s`;
+  const durEl = document.getElementById(`pt-dur-${id}`);
+  if (durEl) durEl.textContent = dur;
 }
 
 function setStarM(id, crit, val) {
@@ -1131,6 +1195,9 @@ function setStarM(id, crit, val) {
   const block = card.querySelector(`.crit-block[data-crit="${crit}"]`);
   if (block) block.querySelectorAll('.star-touch').forEach((s,i) => s.classList.toggle('on', i<val));
   const sc = document.getElementById(`cs-${id}-${crit}`); if(sc) sc.textContent = val;
+  // Marcar hora de fin en la primera calificación completa
+  const allFilled = Object.values(d.criterios).every(v=>v>0);
+  if (allFilled) stampPlatilloEnd(id);
   calcCardM(d); updateFAB();
 }
 
@@ -1304,6 +1371,8 @@ async function submitFromSheet() {
       globalScore: avg,
       items: cardsM.map(c=>({ id:c.id, num:c.num, nombre:c.nombre, categoria:c.categoria,
         criterios:c.criterios, score:c._pct||0, nivel:c._nivel, observaciones:c.obs,
+        timerStart: platilloTimers[c.id]?.start?.toISOString() || null,
+        timerEnd:   platilloTimers[c.id]?.end?.toISOString()   || null,
         evidence:(c.evidence||[]).map(e=>({id:e.id,base64:e.base64,mimeType:e.mimeType,sizeBytes:e.sizeBytes,capturedAt:e.capturedAt,gps:e.gps,gpsVerified:e.gpsVerified}))
       }))
     };
