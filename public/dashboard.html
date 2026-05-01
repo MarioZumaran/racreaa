@@ -1,0 +1,2616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#2C2A24">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<title>DMZ Audit · Dashboard · dmzkitchensupportaudit.com</title>
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@200;300;400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ── SECURITY ── */
+* { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+input,textarea,[contenteditable] { -webkit-user-select:text; user-select:text; }
+@media print { body::before { content:"CONFIDENCIAL — IMPRESIÓN NO AUTORIZADA"; display:block; position:fixed; top:0;left:0;right:0;bottom:0; background:white; z-index:99999; font-size:24px; font-weight:bold; text-align:center; padding-top:40vh; color:#B83232; } body>*{ visibility:hidden!important; } }
+
+/* ── TOKENS ── */
+:root {
+  --bg:       #FAFAF7;
+  --surface:  #FFFFFF;
+  --surface2: #F3F1EB;
+  --border:   #E0DDD4;
+  --border2:  #CCC8BC;
+  --text:     #2C2A24;
+  --text2:    #5C5A54;
+  --text3:    #9A9890;
+  --gold:     #C4922A;
+  --gold-lt:  #F5ECD9;
+  --gold-dim: #8A6C1E;
+  --dark:     #2C2A24;
+  --red:      #B83232; --red-lt:#FAEAEA;
+  --orange:   #C06020; --orange-lt:#FDF0E8;
+  --yellow:   #A07820; --yellow-lt:#FBF5E0;
+  --green:    #2E7D52; --green-lt:#E6F4EC;
+  --green2:   #1A5E3A; --green2-lt:#D6EDE0;
+  --sidebar-w: 220px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{background:var(--bg);font-family:'Urbanist',sans-serif;color:var(--text);display:flex;flex-direction:column;min-height:100vh;font-size:14px;}
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--dark);
+  border-bottom: 2px solid var(--gold);
+  height: 56px;
+  display: flex;
+  align-items: stretch;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 300;
+}
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 24px;
+  border-right: 1px solid rgba(255,255,255,.08);
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+}
+.tb-logo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 5px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.tb-sub {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.25);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.topbar-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 20px;
+}
+.topbar-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,.5);
+  text-transform: uppercase;
+}
+.gps-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  padding: 3px 10px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,.3);
+  text-transform: uppercase;
+}
+.gps-dot-tb {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--text3);
+  transition: background .3s;
+}
+.gps-dot-tb.active { background: var(--green); animation: pulse-dot 2s infinite; }
+.gps-dot-tb.error  { background: var(--red); }
+@keyframes pulse-dot { 0%,100%{opacity:1}50%{opacity:.3} }
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 20px;
+  border-left: 1px solid rgba(255,255,255,.08);
+}
+.session-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.session-name { font-size: 12px; font-weight: 600; color: #E8E5DC; }
+.session-role { font-size: 8px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; }
+.btn-logout {
+  margin-left: 14px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.4);
+  font-family: 'Barlow', sans-serif;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  position: fixed;
+  top: 56px; left: 0; bottom: 0;
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 200;
+}
+.nav-section-label {
+  font-size: 8px;
+  letter-spacing: 3px;
+  color: var(--text3);
+  text-transform: uppercase;
+  padding: 20px 20px 8px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+  border-left: 3px solid transparent;
+  transition: all .15s;
+  text-decoration: none;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: var(--gold-lt); color: var(--gold-dim); border-left-color: var(--gold); font-weight: 600; }
+.nav-item svg { width: 14px; height: 14px; opacity: .6; flex-shrink: 0; }
+.nav-item.active svg { opacity: 1; }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+.sf-label { font-size: 8px; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; }
+.sf-val { font-size: 10px; color: var(--text2); font-family: monospace; margin-top: 3px; word-break: break-all; }
+
+/* ── MAIN CONTENT ── */
+.main-content {
+  margin-left: var(--sidebar-w);
+  margin-top: 56px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ── VIEWS (tabs) ── */
+.view { display: none; padding: 28px 32px 80px; }
+.view.active { display: block; }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: var(--text);
+  text-transform: uppercase;
+  line-height: 1;
+}
+.page-sub { font-size: 11px; color: var(--text3); letter-spacing: 1px; margin-top: 5px; }
+
+/* ── KPI GRID ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--border2);
+  padding: 16px 18px;
+  transition: border-top-color .3s;
+}
+.kpi-card.gold   { border-top-color: var(--gold); }
+.kpi-card.green  { border-top-color: var(--green); }
+.kpi-card.red    { border-top-color: var(--red); }
+.kpi-card.orange { border-top-color: var(--orange); }
+.kpi-card.blue   { border-top-color: #2C7BB8; }
+.kpi-lbl { font-size: 8px; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; display: block; margin-bottom: 6px; }
+.kpi-val { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 32px; line-height: 1; color: var(--text); }
+.kpi-sub { font-size: 10px; color: var(--text3); margin-top: 4px; }
+
+/* ── FILTERS ── */
+.filters-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.f-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  padding: 7px 12px;
+  outline: none;
+  transition: border-color .2s;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.f-input:focus { border-color: var(--gold); }
+.f-input::placeholder { color: var(--text3); }
+.f-select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  padding: 7px 28px 7px 12px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239A9890'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-color: var(--surface);
+}
+.btn-filter {
+  background: var(--gold);
+  border: 1px solid var(--gold);
+  color: var(--surface);
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 7px 18px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-filter:hover { background: var(--gold-dim); }
+.btn-filter.outline {
+  background: transparent;
+  color: var(--text2);
+  border-color: var(--border2);
+}
+.btn-filter.outline:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── TABLE ── */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-table th {
+  background: var(--surface2);
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--text3);
+  text-transform: uppercase;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  vertical-align: middle;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--surface2); }
+.data-table .mono { font-family: monospace; font-size: 11px; color: var(--text3); }
+
+.nivel-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.score-cell {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text3);
+}
+.empty-state .e-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state .e-text { font-size: 13px; }
+
+/* Paginación */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+}
+.page-info { font-size: 11px; color: var(--text3); }
+.page-btns { display: flex; gap: 6px; }
+.page-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.page-btn:hover { border-color: var(--gold); color: var(--gold); }
+.page-btn:disabled { opacity: .4; cursor: not-allowed; }
+.page-btn.active { background: var(--gold); border-color: var(--gold); color: #fff; }
+
+/* ── MINI CHART BARS ── */
+.mini-bar-row { display: flex; gap: 4px; align-items: flex-end; height: 32px; }
+.mini-bar { flex: 1; background: var(--gold); opacity: .7; border-radius: 1px; min-width: 4px; transition: opacity .2s; }
+.mini-bar:hover { opacity: 1; }
+
+/* ── SPLIT VIEW (dashboard + evaluación) ── */
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 480px;
+  gap: 0;
+  min-height: calc(100vh - 56px);
+}
+.split-left {
+  padding: 28px 24px 80px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+.split-right {
+  background: var(--surface);
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* Evaluación embed */
+.eval-header {
+  background: var(--dark);
+  border-bottom: 2px solid var(--gold);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.eval-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.eval-score-badge {
+  background: var(--gold);
+  padding: 5px 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--dark);
+  line-height: 1;
+}
+.eval-body { padding: 20px; }
+
+/* Sección evaluación dentro del dashboard */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 16px;
+}
+.sd-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.sd-line { flex: 1; height: 1px; background: var(--border); }
+.btn-add-eval {
+  background: var(--surface);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-add-eval:hover { background: var(--gold); color: var(--surface); }
+
+/* Platillo cards (compacto dentro del dashboard) */
+.cards-col { display: flex; flex-direction: column; gap: 10px; }
+.platillo-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border2);
+  padding: 14px 16px;
+  position: relative;
+  transition: border-left-color .3s;
+}
+.platillo-card[data-nivel="excelente"]{border-left-color:var(--green2);}
+.platillo-card[data-nivel="bueno"]{border-left-color:var(--green);}
+.platillo-card[data-nivel="regular"]{border-left-color:var(--yellow);}
+.platillo-card[data-nivel="deficiente"]{border-left-color:var(--orange);}
+.platillo-card[data-nivel="critico"]{border-left-color:var(--red);}
+.card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.card-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:26px;color:var(--border2);line-height:1;min-width:30px;margin-top:2px;}
+.card-fields{flex:1;display:flex;flex-direction:column;gap:7px;}
+.field-row{display:flex;gap:8px;}
+.f-name{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Urbanist',sans-serif;font-size:12px;font-weight:600;padding:6px 9px;flex:1;outline:none;transition:border-color .2s;-webkit-user-select:text;user-select:text;}
+.f-name:focus{border-color:var(--gold);}
+.f-name::placeholder{color:var(--text3);font-weight:400;}
+.f-cat{background:var(--bg);border:1px solid var(--border);color:var(--text2);font-family:'Urbanist',sans-serif;font-size:11px;padding:6px 24px 6px 9px;outline:none;width:130px;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239A9890'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-color:var(--bg);}
+.criterios{display:flex;flex-direction:column;gap:6px;}
+.criterio-row{display:flex;align-items:center;gap:8px;}
+.crit-label{font-size:10px;color:var(--text3);width:96px;flex-shrink:0;}
+.stars{display:flex;gap:2px;}
+.star{font-size:15px;cursor:pointer;color:var(--border2);transition:transform .12s,color .12s;user-select:none;line-height:1;}
+.star:hover{transform:scale(1.25);}
+.star.on{color:var(--gold);}
+.score-bar-wrap{flex:1;height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;}
+.score-bar-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .3s;}
+.crit-score{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;color:var(--text3);min-width:12px;text-align:right;}
+.card-footer{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.card-obs{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Urbanist',sans-serif;font-size:11px;padding:6px 9px;flex:1;outline:none;resize:none;height:40px;line-height:1.5;transition:border-color .2s;-webkit-user-select:text;user-select:text;}
+.card-obs::placeholder{color:var(--text3);}
+.card-total{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;}
+.total-ring{width:46px;height:46px;border-radius:50%;border:2px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color .3s;}
+.total-n{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:17px;line-height:1;color:var(--text);}
+.total-sub{font-size:7px;color:var(--text3);letter-spacing:1px;}
+.nivel-tag{font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;background:var(--surface2);color:var(--text3);transition:background .3s,color .3s;}
+.btn-del{position:absolute;top:8px;right:8px;background:transparent;border:none;color:var(--border2);font-size:16px;line-height:1;cursor:pointer;padding:2px 5px;transition:color .2s;}
+.btn-del:hover{color:var(--red);}
+.btn-capture{display:flex;align-items:center;gap:5px;background:var(--surface2);border:1px dashed var(--border2);color:var(--text2);font-family:'Urbanist',sans-serif;font-size:9px;font-weight:600;letter-spacing:1px;padding:5px 10px;cursor:pointer;text-transform:uppercase;transition:all .2s;margin-top:6px;}
+.btn-capture:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-lt);}
+.evidence-zone{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.evidence-thumb{position:relative;width:60px;height:60px;border:1px solid var(--border);overflow:hidden;flex-shrink:0;}
+.evidence-thumb img{width:100%;height:100%;object-fit:cover;}
+.evidence-thumb .gps-stamp{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.72);color:#fff;font-size:5px;font-family:monospace;padding:1px 3px;line-height:1.4;pointer-events:none;}
+.evidence-thumb .del-thumb{position:absolute;top:1px;right:1px;background:rgba(184,50,50,.85);border:none;color:#fff;width:14px;height:14px;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;border-radius:2px;}
+.evidence-thumb:hover .del-thumb{opacity:1;}
+
+/* Panel derecho evaluación */
+.eval-panel{display:flex;flex-direction:column;gap:12px;}
+.panel-block{background:var(--surface);border:1px solid var(--border);padding:16px;}
+.panel-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:9px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.res-cell{background:var(--bg);border:1px solid var(--border);padding:9px 11px;}
+.res-lbl{font-size:7px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:2px;}
+.res-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;color:var(--text);line-height:1;}
+.semaforo{display:flex;gap:5px;justify-content:center;margin:4px 0 8px;}
+.sem-dot{width:10px;height:10px;border-radius:50%;opacity:.2;transition:opacity .3s;border:1px solid rgba(0,0,0,.08);}
+.sem-dot.active{opacity:1;}
+.nivel-bar{height:3px;background:linear-gradient(to right,var(--red),var(--orange),var(--yellow),var(--green),var(--green2));border-radius:2px;position:relative;margin-top:3px;}
+.nivel-needle{width:2px;height:9px;background:var(--text);position:absolute;top:-3px;transform:translateX(-50%);border-radius:1px;transition:left .4s;}
+.dist-list{display:flex;flex-direction:column;gap:6px;}
+.dist-row{display:flex;align-items:center;gap:7px;}
+.dist-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dist-name{font-size:11px;color:var(--text2);flex:1;}
+.dist-count{font-size:11px;font-weight:600;color:var(--text);min-width:16px;text-align:right;}
+.dist-pct{font-size:10px;color:var(--text3);min-width:30px;text-align:right;}
+.dist-bw{flex:1;height:2px;background:var(--surface2);}
+.dist-bf{height:100%;transition:width .4s;}
+.cs-list{display:flex;flex-direction:column;gap:7px;}
+.cs-row{display:flex;align-items:center;gap:7px;}
+.cs-name{font-size:10px;color:var(--text2);flex:1;}
+.cs-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;color:var(--gold-dim);min-width:26px;text-align:right;}
+.cs-bw{width:60px;height:2px;background:var(--surface2);}
+.cs-bf{height:100%;background:var(--gold);transition:width .4s;}
+.concl{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Urbanist',sans-serif;font-size:11px;line-height:1.6;padding:9px 11px;width:100%;outline:none;resize:none;height:80px;transition:border-color .2s;-webkit-user-select:text;user-select:text;}
+.concl:focus{border-color:var(--gold);}
+.concl::placeholder{color:var(--text3);}
+.firmas{display:flex;gap:10px;margin-top:12px;}
+.firma{flex:1;border-top:1px solid var(--text3);padding-top:5px;}
+.firma-lbl{font-size:7px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;}
+.firma-inp{background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Urbanist',sans-serif;font-size:10px;padding:2px 0;width:100%;outline:none;margin-top:3px;-webkit-user-select:text;user-select:text;}
+.firma-inp::placeholder{color:var(--text3);}
+.sig-wrap{margin-top:8px;border:1px solid var(--border);background:var(--bg);}
+.sig-canvas{display:block;width:100%;height:64px;cursor:crosshair;touch-action:none;}
+.sig-actions{display:flex;justify-content:flex-end;padding:3px 7px;border-top:1px solid var(--border);}
+.sig-btn{background:transparent;border:none;color:var(--text3);font-size:8px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;padding:2px 5px;font-family:'Urbanist',sans-serif;font-weight:600;}
+.sig-btn:hover{color:var(--gold);}
+.btn-act{display:block;width:100%;padding:10px;font-family:'Urbanist',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:7px;transition:all .2s;}
+.btn-act.solid{background:var(--gold);border:1px solid var(--gold);color:var(--surface);}
+.btn-act.solid:hover{background:var(--gold-dim);}
+.btn-act.outline{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-act.outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-act:disabled{opacity:.4;cursor:not-allowed;}
+.submit-status{margin-top:8px;padding:8px 12px;border:1px solid var(--border);background:var(--surface2);font-size:10px;color:var(--text2);display:none;align-items:center;gap:7px;}
+.submit-status.visible{display:flex;}
+.submit-status.success{background:var(--green-lt);border-color:var(--green);color:var(--green2);}
+.submit-status.error{background:var(--red-lt);border-color:var(--red);color:var(--red);}
+.submit-status.loading{background:var(--gold-lt);border-color:var(--gold);color:var(--gold-dim);}
+.spinner{width:12px;height:12px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin .5s linear infinite;flex-shrink:0;display:none;}
+.spinner.visible{display:block;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Meta inputs del header evaluación */
+.eval-meta-bar {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.meta-pair { display: flex; flex-direction: column; gap: 3px; }
+.meta-pair-label { font-size: 8px; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; }
+.meta-pair-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  padding: 5px 8px;
+  outline: none;
+  transition: border-color .2s;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.meta-pair-input:focus { border-color: var(--gold); }
+.meta-pair-input::placeholder { color: var(--text3); }
+
+/* GPS bar */
+.gps-micro {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 20px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  font-size: 9px;
+}
+.gps-micro-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text3); transition: background .3s; flex-shrink: 0; }
+.gps-micro-dot.active { background: var(--green); }
+.gps-micro-text { color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
+.gps-micro-coords { color: var(--text2); font-family: monospace; font-size: 9px; }
+
+/* ── RELOJ TOPBAR ── */
+.clock-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0 20px;
+  border-left: 1px solid rgba(255,255,255,.08);
+  flex-shrink: 0;
+}
+.clock-time {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #E8E5DC;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+.clock-date {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.3);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.clock-arrived {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--gold);
+  margin-top: 1px;
+}
+
+/* ── EVALUACIÓN DE SERVICIO DE SALÓN ── */
+.salon-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 0;
+  min-height: calc(100vh - 56px);
+}
+.salon-left {
+  padding: 28px 24px 80px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+.salon-right {
+  background: var(--surface);
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* Criterio de salón */
+.salon-criterio {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border2);
+  margin-bottom: 10px;
+  transition: border-left-color .3s;
+  position: relative;
+}
+.salon-criterio[data-score="5"] { border-left-color: var(--green2); }
+.salon-criterio[data-score="4"] { border-left-color: var(--green); }
+.salon-criterio[data-score="3"] { border-left-color: var(--yellow); }
+.salon-criterio[data-score="2"] { border-left-color: var(--orange); }
+.salon-criterio[data-score="1"] { border-left-color: var(--red); }
+
+.sc-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+}
+.sc-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 24px;
+  color: var(--border2);
+  line-height: 1;
+  min-width: 28px;
+  flex-shrink: 0;
+}
+.sc-info { flex: 1; }
+.sc-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.2;
+}
+.sc-subtitle {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 3px;
+  letter-spacing: .5px;
+}
+.sc-score-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color .3s;
+}
+.sc-score-n {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--text);
+}
+.sc-score-lbl { font-size: 7px; color: var(--text3); letter-spacing: 1px; }
+.sc-chevron {
+  width: 14px; height: 14px;
+  color: var(--text3);
+  transition: transform .2s;
+  flex-shrink: 0;
+}
+.salon-criterio.expanded .sc-chevron { transform: rotate(180deg); }
+
+.sc-body {
+  display: none;
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--border);
+}
+.salon-criterio.expanded .sc-body { display: block; }
+
+/* Rubrica (tabla de criterios internos) */
+.rubrica {
+  margin-bottom: 14px;
+}
+.rubrica-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.rubrica-item:last-child { border-bottom: none; }
+.rubrica-texto {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text2);
+  line-height: 1.4;
+}
+.rubrica-peso {
+  font-size: 9px;
+  color: var(--text3);
+  width: 30px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.rubrica-stars { display: flex; gap: 3px; flex-shrink: 0; }
+.rubrica-star {
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--border2);
+  transition: color .1s, transform .1s;
+  line-height: 1;
+  user-select: none;
+}
+.rubrica-star:hover { transform: scale(1.2); }
+.rubrica-star.on { color: var(--gold); }
+
+/* Indicadores expertos F&B */
+.indicadores {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.ind-label {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.ind-list { display: flex; flex-direction: column; gap: 5px; }
+.ind-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 10px;
+  color: var(--text2);
+  line-height: 1.4;
+}
+.ind-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+/* Obs textarea por criterio */
+.sc-obs {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  padding: 7px 10px;
+  width: 100%;
+  outline: none;
+  resize: none;
+  height: 52px;
+  line-height: 1.5;
+  margin-top: 10px;
+  transition: border-color .2s;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.sc-obs:focus { border-color: var(--gold); }
+.sc-obs::placeholder { color: var(--text3); }
+
+/* Timer de servicio */
+.timer-block {
+  background: var(--dark);
+  border: 1px solid var(--gold);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.timer-display {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 32px;
+  color: var(--gold);
+  letter-spacing: 3px;
+  line-height: 1;
+}
+.timer-label { font-size: 8px; letter-spacing: 2px; color: rgba(255,255,255,.4); text-transform: uppercase; margin-top: 3px; }
+.timer-btns { display: flex; gap: 7px; margin-left: auto; }
+.timer-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.2);
+  color: rgba(255,255,255,.6);
+  font-family: 'Barlow', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.timer-btn:hover { border-color: var(--gold); color: var(--gold); }
+.timer-btn.active { background: var(--gold); border-color: var(--gold); color: var(--dark); }
+
+/* Momento del servicio badge */
+.momento-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+@media (max-width: 1100px) {
+  .split-layout { grid-template-columns: 1fr; }
+  .split-right { border-top: 2px solid var(--gold); }
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .salon-layout { grid-template-columns: 1fr; }
+  .salon-right { border-top: 2px solid var(--gold); }
+}
+@media (max-width: 768px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { transform: translateX(-100%); transition: transform .3s; width: 220px; }
+  .sidebar.open { transform: translateX(0); }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand" style="width:auto;padding:0 20px;gap:12px;">
+    <div style="width:40px;height:40px;border-radius:50%;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <img src="/logo-dmz.jpg" alt="DMZ" style="width:36px;height:36px;object-fit:cover;border-radius:50%;">
+    </div>
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;line-height:1">DMZ AUDIT</div>
+      <div style="font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.25);text-transform:uppercase;margin-top:3px">dmzkitchensupportaudit.com</div>
+    </div>
+  </div>
+  <div class="topbar-center">
+    <span class="topbar-title" id="view-title">Dashboard</span>
+    <div class="gps-pill">
+      <div class="gps-dot-tb" id="gps-dot-tb"></div>
+      <span id="gps-status-tb">GPS...</span>
+      <span id="gps-coords-tb" style="margin-left:4px;font-family:monospace;font-size:8px;"></span>
+    </div>
+  </div>
+  <div class="clock-block">
+    <div class="clock-time" id="clock-time">00:00:00</div>
+    <div class="clock-date" id="clock-date">—</div>
+    <div class="clock-arrived" id="clock-arrived"></div>
+  </div>
+  <div class="topbar-right">
+    <div class="session-info">
+      <span class="session-name" id="session-name">—</span>
+      <span class="session-role" id="session-role">—</span>
+    </div>
+    <button class="btn-logout" onclick="logout()">Salir</button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="nav-section-label">Módulos</div>
+
+  <a class="nav-item active" onclick="showView('dashboard')" id="nav-dashboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+    </svg>
+    Dashboard
+  </a>
+
+  <a class="nav-item" onclick="showView('evaluacion')" id="nav-evaluacion">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+    </svg>
+    Nueva Evaluación
+  </a>
+
+  <a class="nav-item" onclick="showView('salon')" id="nav-salon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    Evaluación de Salón
+  </a>
+
+  <a class="nav-item" onclick="showView('historial')" id="nav-historial">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+    </svg>
+    Historial
+  </a>
+
+  <div class="nav-section-label" style="margin-top:8px">Cuenta</div>
+
+  <a class="nav-item" onclick="showView('ajustes')" id="nav-ajustes">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+    Ajustes
+  </a>
+
+  <div class="sidebar-footer">
+    <div class="sf-label">Tenant</div>
+    <div class="sf-val" id="sf-tenant">—</div>
+    <div class="sf-label" style="margin-top:8px">dmzkitchensupportaudit.com</div>
+    <div class="sf-val" id="sf-session">—</div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+  <!-- ════ VIEW: DASHBOARD ════ -->
+  <div class="view active" id="view-dashboard">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard Operativo</div>
+        <div class="page-sub" id="dash-sub">Resumen de auditorías — cargando...</div>
+      </div>
+      <button class="btn-filter" onclick="showView('evaluacion')">+ Nueva Evaluación</button>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card gold">
+        <span class="kpi-lbl">Total Auditorías</span>
+        <div class="kpi-val" id="kpi-total">—</div>
+        <div class="kpi-sub">registradas</div>
+      </div>
+      <div class="kpi-card green">
+        <span class="kpi-lbl">Promedio Global</span>
+        <div class="kpi-val" id="kpi-avg">—</div>
+        <div class="kpi-sub">/ 100 pts</div>
+      </div>
+      <div class="kpi-card blue">
+        <span class="kpi-lbl">Excelentes</span>
+        <div class="kpi-val" id="kpi-excelente">—</div>
+        <div class="kpi-sub">score ≥ 85</div>
+      </div>
+      <div class="kpi-card orange">
+        <span class="kpi-lbl">Regulares</span>
+        <div class="kpi-val" id="kpi-regular">—</div>
+        <div class="kpi-sub">score 55–70</div>
+      </div>
+      <div class="kpi-card red">
+        <span class="kpi-lbl">Críticos</span>
+        <div class="kpi-val" id="kpi-critico">—</div>
+        <div class="kpi-sub">score < 40</div>
+      </div>
+    </div>
+
+    <!-- Últimas auditorías -->
+    <div class="section-divider">
+      <span class="sd-label">Últimas Evaluaciones</span>
+      <div class="sd-line"></div>
+      <button class="btn-add-eval" onclick="showView('historial')">Ver todo</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Establecimiento</th>
+            <th>Auditor</th>
+            <th>Fecha</th>
+            <th>Servicio</th>
+            <th>Score</th>
+            <th>Nivel</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="dash-table-body">
+          <tr><td colspan="8" class="empty-state"><div class="e-icon">⏳</div><div class="e-text">Cargando auditorías...</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ════ VIEW: EVALUACIÓN ════ -->
+  <div class="view" id="view-evaluacion">
+    <div class="split-layout">
+
+      <!-- IZQUIERDA: Platillos -->
+      <div class="split-left">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Nueva Evaluación</div>
+            <div class="page-sub">Calificación de Alimentos · DMZ Audit</div>
+          </div>
+          <button class="btn-add-eval" onclick="addCard()">+ Agregar platillo</button>
+        </div>
+
+        <!-- Meta -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);padding:16px;">
+          <div class="meta-pair">
+            <span class="meta-pair-label">Establecimiento</span>
+            <input class="meta-pair-input" id="m-est" placeholder="Nombre del restaurante">
+          </div>
+          <div class="meta-pair">
+            <span class="meta-pair-label">Auditor</span>
+            <input class="meta-pair-input" id="m-aud" placeholder="Nombre">
+          </div>
+          <div class="meta-pair">
+            <span class="meta-pair-label">Fecha</span>
+            <input class="meta-pair-input" id="m-fecha" type="date">
+          </div>
+          <div class="meta-pair">
+            <span class="meta-pair-label">Servicio</span>
+            <input class="meta-pair-input" id="m-srv" placeholder="Desayuno / Comida / Cena">
+          </div>
+        </div>
+
+        <!-- GPS micro -->
+        <div class="gps-micro">
+          <div class="gps-micro-dot" id="gps-micro-dot"></div>
+          <span class="gps-micro-text" id="gps-micro-text">GPS inicializando...</span>
+          <span class="gps-micro-coords" id="gps-micro-coords"></span>
+        </div>
+
+        <!-- Tarjetas -->
+        <div class="cards-col" id="cards-col" style="margin-top:16px;"></div>
+      </div>
+
+      <!-- DERECHA: Panel resumen + envío -->
+      <div class="split-right">
+        <div class="eval-header">
+          <div class="eval-title">Resumen · Envío</div>
+          <div class="eval-score-badge" id="global-num">—</div>
+        </div>
+        <div style="padding:16px;">
+          <div class="eval-panel">
+
+            <div class="panel-block">
+              <div class="panel-title">Resumen de Evaluación</div>
+              <div class="res-grid">
+                <div class="res-cell"><span class="res-lbl">Platillos</span><span class="res-val" id="r-total">0</span></div>
+                <div class="res-cell"><span class="res-lbl">Promedio</span><span class="res-val" id="r-prom">—</span></div>
+                <div class="res-cell"><span class="res-lbl">Calificación</span><span class="res-val" id="r-letra" style="font-size:26px">—</span></div>
+                <div class="res-cell"><span class="res-lbl">Nivel</span><span class="res-val" id="r-nivel" style="font-size:12px;letter-spacing:1px">—</span></div>
+              </div>
+              <div class="semaforo">
+                <div class="sem-dot" style="background:var(--red)"    id="sem-critico"></div>
+                <div class="sem-dot" style="background:var(--orange)" id="sem-deficiente"></div>
+                <div class="sem-dot" style="background:var(--yellow)" id="sem-regular"></div>
+                <div class="sem-dot" style="background:var(--green)"  id="sem-bueno"></div>
+                <div class="sem-dot" style="background:var(--green2)" id="sem-excelente"></div>
+              </div>
+              <div class="nivel-bar"><div class="nivel-needle" id="nivel-needle" style="left:50%"></div></div>
+            </div>
+
+            <div class="panel-block">
+              <div class="panel-title">Distribución por Nivel</div>
+              <div class="dist-list" id="dist-list"></div>
+            </div>
+
+            <div class="panel-block">
+              <div class="panel-title">Promedio por Criterio</div>
+              <div class="cs-list" id="cs-list"></div>
+            </div>
+
+            <div class="panel-block">
+              <div class="panel-title">Conclusión · Firma · Envío</div>
+              <textarea class="concl" id="conclusion" placeholder="Dictamen final y recomendaciones..."></textarea>
+              <div class="firmas">
+                <div class="firma">
+                  <div class="firma-lbl">Auditor DMZ</div>
+                  <input class="firma-inp" id="fa" placeholder="Nombre completo">
+                </div>
+                <div class="firma">
+                  <div class="firma-lbl">Chef / Responsable</div>
+                  <input class="firma-inp" id="fc" placeholder="Nombre completo">
+                </div>
+              </div>
+              <div class="sig-wrap">
+                <canvas class="sig-canvas" id="sig-canvas" width="280" height="64"></canvas>
+                <div class="sig-actions">
+                  <button class="sig-btn" onclick="clearSig()">Limpiar firma</button>
+                </div>
+              </div>
+              <div class="submit-status" id="submit-status">
+                <div class="spinner" id="spinner"></div>
+                <span id="submit-msg">Procesando...</span>
+              </div>
+              <button class="btn-act solid" id="btn-submit" onclick="submitAudit()">Enviar Evaluación Segura</button>
+              <button class="btn-act outline" onclick="limpiar()">Nueva Evaluación</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ VIEW: HISTORIAL ════ -->
+  <div class="view" id="view-historial">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Historial de Auditorías</div>
+        <div class="page-sub">Registro completo · Trazabilidad permanente</div>
+      </div>
+      <button class="btn-filter" onclick="showView('evaluacion')">+ Nueva</button>
+    </div>
+
+    <div class="filters-bar">
+      <input class="f-input" id="f-search" placeholder="Buscar establecimiento..." style="width:200px" oninput="applyFilters()">
+      <select class="f-select" id="f-nivel" onchange="applyFilters()">
+        <option value="">Todos los niveles</option>
+        <option value="excelente">Excelente</option>
+        <option value="bueno">Bueno</option>
+        <option value="regular">Regular</option>
+        <option value="deficiente">Deficiente</option>
+        <option value="critico">Crítico</option>
+      </select>
+      <input class="f-input" id="f-from" type="date" style="width:140px" onchange="applyFilters()">
+      <input class="f-input" id="f-to"   type="date" style="width:140px" onchange="applyFilters()">
+      <button class="btn-filter outline" onclick="resetFilters()">Limpiar</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID Auditoría</th>
+            <th>Establecimiento</th>
+            <th>Auditor</th>
+            <th>Fecha</th>
+            <th>Servicio</th>
+            <th>Platillos</th>
+            <th>Score</th>
+            <th>Nivel</th>
+            <th>GPS</th>
+            <th>Timestamp Servidor</th>
+          </tr>
+        </thead>
+        <tbody id="hist-table-body">
+          <tr><td colspan="10" class="empty-state"><div class="e-icon">⏳</div><div class="e-text">Cargando...</div></td></tr>
+        </tbody>
+      </table>
+      <div class="pagination">
+        <span class="page-info" id="page-info">—</span>
+        <div class="page-btns">
+          <button class="page-btn" id="btn-prev" onclick="changePage(-1)" disabled>← Anterior</button>
+          <button class="page-btn" id="btn-next" onclick="changePage(1)"  disabled>Siguiente →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ VIEW: AJUSTES ════ -->
+  <div class="view" id="view-ajustes">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Ajustes de Cuenta</div>
+        <div class="page-sub">Información del operador y tenant</div>
+      </div>
+    </div>
+    <div style="max-width:480px;display:flex;flex-direction:column;gap:12px;">
+      <div class="panel-block" style="background:var(--surface);border:1px solid var(--border);padding:20px;">
+        <div class="panel-title">Operador</div>
+        <div style="display:flex;flex-direction:column;gap:10px;" id="op-info"></div>
+      </div>
+      <div class="panel-block" style="background:var(--surface);border:1px solid var(--border);padding:20px;">
+        <div class="panel-title">Tenant</div>
+        <div style="display:flex;flex-direction:column;gap:10px;" id="tenant-info"></div>
+      </div>
+      <div class="panel-block" style="background:var(--surface);border:1px solid var(--border);padding:20px;">
+        <div class="panel-title">Credenciales de Acceso</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.8;">
+          <div>URL de acceso:</div>
+          <code style="background:var(--surface2);padding:4px 8px;font-size:10px;display:block;margin:4px 0;word-break:break-all;" id="login-url">—</code>
+          <div style="margin-top:8px;font-size:10px;color:var(--text3);">Comparte solo con operadores autorizados. Nunca compartas tu contraseña.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ VIEW: EVALUACIÓN DE SALÓN ════ -->
+  <div class="view" id="view-salon">
+    <div class="salon-layout">
+
+      <!-- IZQUIERDA: Criterios -->
+      <div class="salon-left">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Evaluación de Servicio de Salón</div>
+            <div class="page-sub">Auditoría F&B · Estándares de Calidad · De La Mora Zumarán Kitchen Support</div>
+          </div>
+        </div>
+
+        <!-- Meta del servicio -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;background:var(--surface);border:1px solid var(--border);padding:14px;">
+          <div class="meta-pair">
+            <span class="meta-pair-label">Establecimiento</span>
+            <input class="meta-pair-input" id="s-est" placeholder="Nombre">
+          </div>
+          <div class="meta-pair">
+            <span class="meta-pair-label">Auditor</span>
+            <input class="meta-pair-input" id="s-aud" placeholder="Nombre del auditor">
+          </div>
+          <div class="meta-pair">
+            <span class="meta-pair-label">Fecha</span>
+            <input class="meta-pair-input" id="s-fecha" type="date">
+          </div>
+          <div class="meta-pair">
+            <span class="meta-pair-label">Turno</span>
+            <select class="meta-pair-input" id="s-turno" style="appearance:none;cursor:pointer">
+              <option value="">Seleccionar...</option>
+              <option>Desayuno</option>
+              <option>Comida</option>
+              <option>Cena</option>
+              <option>Brunch</option>
+            </select>
+          </div>
+          <div class="meta-pair">
+            <span class="meta-pair-label">Mesa / Zona</span>
+            <input class="meta-pair-input" id="s-mesa" placeholder="Mesa #, zona o barra">
+          </div>
+          <div class="meta-pair">
+            <span class="meta-pair-label">Mesero evaluado</span>
+            <input class="meta-pair-input" id="s-mesero" placeholder="Nombre">
+          </div>
+        </div>
+
+        <!-- Timer de servicio -->
+        <div class="timer-block">
+          <div>
+            <div class="timer-display" id="salon-timer">00:00</div>
+            <div class="timer-label" id="timer-phase">Tiempo de servicio</div>
+          </div>
+          <div class="timer-btns">
+            <button class="timer-btn active" id="btn-timer-llegada" onclick="marcarMomento('llegada')">Llegada</button>
+            <button class="timer-btn" id="btn-timer-orden" onclick="marcarMomento('orden')">Orden</button>
+            <button class="timer-btn" id="btn-timer-alimentos" onclick="marcarMomento('alimentos')">Alimentos</button>
+            <button class="timer-btn" id="btn-timer-cuenta" onclick="marcarMomento('cuenta')">Cuenta</button>
+            <button class="timer-btn" id="btn-timer-reset" onclick="resetTimer()" style="border-color:var(--red);color:var(--red)">Reset</button>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             CRITERIO 1: SALUDO Y BIENVENIDA
+             ══════════════════════════════════ -->
+        <div class="salon-criterio" id="sc-1">
+          <div class="sc-header" onclick="toggleCriterio('sc-1')">
+            <span class="sc-num">01</span>
+            <div class="sc-info">
+              <div class="sc-title">Saludo y Bienvenida</div>
+              <div class="sc-subtitle">Primera impresión · Protocolo de recepción · Actitud de servicio</div>
+            </div>
+            <div class="sc-score-ring" id="ring-sc-1">
+              <span class="sc-score-n" id="score-sc-1">—</span>
+              <span class="sc-score-lbl">/ 5</span>
+            </div>
+            <svg class="sc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="sc-body">
+            <div class="indicadores">
+              <div class="ind-label">Estándares F&B — Qué evaluar</div>
+              <div class="ind-list">
+                <div class="ind-item"><div class="ind-dot"></div>El mesero saluda en los primeros 60 segundos de que el cliente es sentado — estándar USPH y Forbes Travel Guide.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Contacto visual, postura abierta y sonrisa genuina. Lenguaje corporal proyecta disposición, no urgencia.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Bienvenida personalizada: menciona el nombre del restaurante / concepto. "Buenos días, bienvenidos a…"</div>
+                <div class="ind-item"><div class="ind-dot"></div>Si hay niños o personas mayores, el saludo los incluye. Diferenciación en el trato sin ser condescendiente.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Presentación personal con nombre propio. Crea vínculo y aumenta la propina en un 23% (Cornell HRS, 2021).</div>
+              </div>
+            </div>
+            <div class="rubrica">
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Tiempo de reacción ≤ 60 seg / saludo proactivo antes de ser solicitado</span>
+                <span class="rubrica-peso">20%</span>
+                <div class="rubrica-stars" data-criterio="sc-1" data-sub="tiempo">
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','tiempo',1,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','tiempo',2,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','tiempo',3,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','tiempo',4,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','tiempo',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Calidad del saludo: verbal, contacto visual y lenguaje corporal positivo</span>
+                <span class="rubrica-peso">30%</span>
+                <div class="rubrica-stars" data-criterio="sc-1" data-sub="calidad">
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','calidad',1,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','calidad',2,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','calidad',3,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','calidad',4,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','calidad',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Presentación personal con nombre / personalización del servicio</span>
+                <span class="rubrica-peso">25%</span>
+                <div class="rubrica-stars" data-criterio="sc-1" data-sub="presentacion">
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','presentacion',1,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','presentacion',2,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','presentacion',3,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','presentacion',4,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','presentacion',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Entrega de menú / carta con protocolo: abierto, dama primero, postura</span>
+                <span class="rubrica-peso">25%</span>
+                <div class="rubrica-stars" data-criterio="sc-1" data-sub="menu">
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','menu',1,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','menu',2,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','menu',3,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','menu',4,this)">★</span>
+                  <span class="rubrica-star" onclick="setSubStar('sc-1','menu',5,this)">★</span>
+                </div>
+              </div>
+            </div>
+            <textarea class="sc-obs" id="obs-sc-1" placeholder="Observaciones específicas de saludo y bienvenida…"></textarea>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             CRITERIO 2: SECUENCIA DE SERVICIO
+             ══════════════════════════════════ -->
+        <div class="salon-criterio" id="sc-2">
+          <div class="sc-header" onclick="toggleCriterio('sc-2')">
+            <span class="sc-num">02</span>
+            <div class="sc-info">
+              <div class="sc-title">Secuencia de Servicio</div>
+              <div class="sc-subtitle">Flujo de la experiencia · Timing · Mise en place · Protocolo de mesa</div>
+            </div>
+            <div class="sc-score-ring" id="ring-sc-2">
+              <span class="sc-score-n" id="score-sc-2">—</span>
+              <span class="sc-score-lbl">/ 5</span>
+            </div>
+            <svg class="sc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="sc-body">
+            <div class="indicadores">
+              <div class="ind-label">Estándares F&B — Qué evaluar</div>
+              <div class="ind-list">
+                <div class="ind-item"><div class="ind-dot"></div>Secuencia correcta: agua → bebida → orden → entrada → plato fuerte → postre → digestivo → cuenta. Cada etapa tiene un tiempo ideal.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Tiempo de entrega de bebidas: ≤ 3 min. Entradas: ≤ 10 min. Plato fuerte: ≤ 18 min. Cualquier demora requiere comunicación proactiva.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Servicio por la derecha para alimentos sólidos, por la izquierda para bebidas (protocolo estándar AMRESTORAN / NRA). Sin cruzar el brazo sobre el cliente.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Check-back obligatorio: revisitar la mesa en los primeros 2 bocados — "¿Todo está a su gusto?" Demuestra ownership del servicio.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Debarrazar con permiso verbal, nunca arrebatar platos. Sincronización del equipo para servir simultáneamente a toda la mesa.</div>
+              </div>
+            </div>
+            <div class="rubrica">
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Orden lógico y flujo correcto de la secuencia de servicio completa</span>
+                <span class="rubrica-peso">25%</span>
+                <div class="rubrica-stars" data-criterio="sc-2" data-sub="flujo">
+                  <span class="rubrica-star" onclick="setSubStar('sc-2','flujo',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','flujo',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','flujo',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','flujo',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','flujo',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Timing y tiempos de entrega dentro de los estándares establecidos</span>
+                <span class="rubrica-peso">30%</span>
+                <div class="rubrica-stars" data-criterio="sc-2" data-sub="timing">
+                  <span class="rubrica-star" onclick="setSubStar('sc-2','timing',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','timing',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','timing',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','timing',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','timing',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Protocolo de servicio: por qué lado, postura, sincronización del equipo</span>
+                <span class="rubrica-peso">25%</span>
+                <div class="rubrica-stars" data-criterio="sc-2" data-sub="protocolo">
+                  <span class="rubrica-star" onclick="setSubStar('sc-2','protocolo',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','protocolo',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','protocolo',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','protocolo',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','protocolo',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Check-back y debarrizado con protocolo correcto y permiso verbal</span>
+                <span class="rubrica-peso">20%</span>
+                <div class="rubrica-stars" data-criterio="sc-2" data-sub="checkback">
+                  <span class="rubrica-star" onclick="setSubStar('sc-2','checkback',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','checkback',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','checkback',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','checkback',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-2','checkback',5,this)">★</span>
+                </div>
+              </div>
+            </div>
+            <textarea class="sc-obs" id="obs-sc-2" placeholder="Observaciones sobre la secuencia de servicio…"></textarea>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             CRITERIO 3: CONOCIMIENTO DE MENÚ
+             ══════════════════════════════════ -->
+        <div class="salon-criterio" id="sc-3">
+          <div class="sc-header" onclick="toggleCriterio('sc-3')">
+            <span class="sc-num">03</span>
+            <div class="sc-info">
+              <div class="sc-title">Conocimiento de Menú</div>
+              <div class="sc-subtitle">Product knowledge · Ingredientes · Alérgenos · Maridaje · Técnicas</div>
+            </div>
+            <div class="sc-score-ring" id="ring-sc-3">
+              <span class="sc-score-n" id="score-sc-3">—</span>
+              <span class="sc-score-lbl">/ 5</span>
+            </div>
+            <svg class="sc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="sc-body">
+            <div class="indicadores">
+              <div class="ind-label">Estándares F&B — Qué evaluar</div>
+              <div class="ind-list">
+                <div class="ind-item"><div class="ind-dot"></div>Conocimiento de los 14 alérgenos mayores (Reglamento UE 1169/2011). El mesero debe responder sin dudar o consultar internamente en ≤ 30 seg.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Descripción sensorial de los platillos: puede hablar de sabores, texturas, técnicas de cocción y presentación sin leer la carta.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Conocimiento de maridaje básico: vino / platillo, cocteles / cocina. Puede sugerir con argumentos, no solo por precio.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Manejo de preguntas difíciles: restricciones dietéticas (vegano, sin gluten, kosher). Ofrece alternativas reales, no evasivas.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Conoce los especiales del día, las 86 (platillos sin existencia) y las novedades de temporada antes de que el cliente pregunte.</div>
+              </div>
+            </div>
+            <div class="rubrica">
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Dominio de ingredientes, técnicas y descripción sensorial de platillos</span>
+                <span class="rubrica-peso">30%</span>
+                <div class="rubrica-stars" data-criterio="sc-3" data-sub="ingredientes">
+                  <span class="rubrica-star" onclick="setSubStar('sc-3','ingredientes',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','ingredientes',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','ingredientes',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','ingredientes',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','ingredientes',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Manejo de alérgenos y restricciones dietéticas con seguridad y precisión</span>
+                <span class="rubrica-peso">30%</span>
+                <div class="rubrica-stars" data-criterio="sc-3" data-sub="alergenos">
+                  <span class="rubrica-star" onclick="setSubStar('sc-3','alergenos',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','alergenos',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','alergenos',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','alergenos',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','alergenos',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Conocimiento de maridaje y capacidad de recomendar con criterio</span>
+                <span class="rubrica-peso">20%</span>
+                <div class="rubrica-stars" data-criterio="sc-3" data-sub="maridaje">
+                  <span class="rubrica-star" onclick="setSubStar('sc-3','maridaje',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','maridaje',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','maridaje',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','maridaje',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','maridaje',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Conoce especiales, 86s y novedades del día sin consultar a cocina</span>
+                <span class="rubrica-peso">20%</span>
+                <div class="rubrica-stars" data-criterio="sc-3" data-sub="especiales">
+                  <span class="rubrica-star" onclick="setSubStar('sc-3','especiales',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','especiales',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','especiales',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','especiales',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-3','especiales',5,this)">★</span>
+                </div>
+              </div>
+            </div>
+            <textarea class="sc-obs" id="obs-sc-3" placeholder="Observaciones sobre conocimiento de menú…"></textarea>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             CRITERIO 4: CLIENTE REDONDO
+             ══════════════════════════════════ -->
+        <div class="salon-criterio" id="sc-4">
+          <div class="sc-header" onclick="toggleCriterio('sc-4')">
+            <span class="sc-num">04</span>
+            <div class="sc-info">
+              <div class="sc-title">Cliente Redondo</div>
+              <div class="sc-subtitle">Satisfacción 360° · Manejo de objeciones · Recuperación del servicio · Fidelización</div>
+            </div>
+            <div class="sc-score-ring" id="ring-sc-4">
+              <span class="sc-score-n" id="score-sc-4">—</span>
+              <span class="sc-score-lbl">/ 5</span>
+            </div>
+            <svg class="sc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="sc-body">
+            <div class="indicadores">
+              <div class="ind-label">Estándares F&B — Qué evaluar</div>
+              <div class="ind-list">
+                <div class="ind-item"><div class="ind-dot"></div>"Cliente redondo" = atención integral desde que llega hasta que sale. El mesero es el dueño de la experiencia completa de esa mesa.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Anticipación de necesidades: reponer agua sin que se solicite, ofrecer más pan, retirar platos vacíos, limpiar migas. Servicio invisible pero perceptible.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Manejo de quejas con el protocolo LAST (Listen, Apologize, Solve, Thank). Nunca se discute, nunca se escuda en cocina o colegas.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Cierre de la experiencia: despedida personal, invitación a regresar, verificar satisfacción antes de que el cliente salga. La última impresión es la más duradera.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Personalización de detalles memorables: cumpleaños, aniversarios, preferencias recordadas. Net Promoter Score (NPS) se mueve por estas acciones.</div>
+              </div>
+            </div>
+            <div class="rubrica">
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Anticipación de necesidades sin que el cliente solicite — servicio proactivo</span>
+                <span class="rubrica-peso">25%</span>
+                <div class="rubrica-stars" data-criterio="sc-4" data-sub="anticipacion">
+                  <span class="rubrica-star" onclick="setSubStar('sc-4','anticipacion',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','anticipacion',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','anticipacion',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','anticipacion',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','anticipacion',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Manejo de quejas y objeciones con protocolo LAST — empático y resolutivo</span>
+                <span class="rubrica-peso">30%</span>
+                <div class="rubrica-stars" data-criterio="sc-4" data-sub="quejas">
+                  <span class="rubrica-star" onclick="setSubStar('sc-4','quejas',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','quejas',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','quejas',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','quejas',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','quejas',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Cierre y despedida de calidad: verificación de satisfacción e invitación a regresar</span>
+                <span class="rubrica-peso">25%</span>
+                <div class="rubrica-stars" data-criterio="sc-4" data-sub="cierre">
+                  <span class="rubrica-star" onclick="setSubStar('sc-4','cierre',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','cierre',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','cierre',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','cierre',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','cierre',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Personalización y detalles memorables: cumpleaños, preferencias, atenciones especiales</span>
+                <span class="rubrica-peso">20%</span>
+                <div class="rubrica-stars" data-criterio="sc-4" data-sub="personalizacion">
+                  <span class="rubrica-star" onclick="setSubStar('sc-4','personalizacion',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','personalizacion',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','personalizacion',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','personalizacion',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-4','personalizacion',5,this)">★</span>
+                </div>
+              </div>
+            </div>
+            <textarea class="sc-obs" id="obs-sc-4" placeholder="Observaciones sobre atención integral al cliente…"></textarea>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             CRITERIO 5: VENTA SUGESTIVA
+             ══════════════════════════════════ -->
+        <div class="salon-criterio" id="sc-5">
+          <div class="sc-header" onclick="toggleCriterio('sc-5')">
+            <span class="sc-num">05</span>
+            <div class="sc-info">
+              <div class="sc-title">Venta Sugestiva</div>
+              <div class="sc-subtitle">Upselling · Cross-selling · Ticket promedio · Técnica consultiva · Sin presión</div>
+            </div>
+            <div class="sc-score-ring" id="ring-sc-5">
+              <span class="sc-score-n" id="score-sc-5">—</span>
+              <span class="sc-score-lbl">/ 5</span>
+            </div>
+            <svg class="sc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="sc-body">
+            <div class="indicadores">
+              <div class="ind-label">Estándares F&B — Qué evaluar</div>
+              <div class="ind-list">
+                <div class="ind-item"><div class="ind-dot"></div>Upselling correcto: "¿Le gustaría una copa de vino de la casa para acompañar? Tenemos un Tempranillo que va perfecto con su elección." — no "¿Algo para tomar?"</div>
+                <div class="ind-item"><div class="ind-dot"></div>Cross-selling sin presión: ofrece complementos naturales (guarniciones, salsas especiales, extras) en el momento correcto de la secuencia.</div>
+                <div class="ind-item"><div class="ind-dot"></div>Siempre sugiere usando lenguaje descriptivo y sensorial, nunca precio como primer argumento. "Es cremoso, con notas a vainilla…" antes de "cuesta $X".</div>
+                <div class="ind-item"><div class="ind-dot"></div>Ofrece postre y digestivos ANTES de traer la cuenta. El 68% de los clientes acepta postre si se ofrece con descripción (NRA Study 2022).</div>
+                <div class="ind-item"><div class="ind-dot"></div>No vende con desesperación ni presiona. La venta sugestiva profesional se siente como una recomendación de amigo experto, nunca de vendedor.</div>
+              </div>
+            </div>
+            <div class="rubrica">
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Técnica de upselling: ofrece mejoras con argumentos sensoriales y contexto</span>
+                <span class="rubrica-peso">25%</span>
+                <div class="rubrica-stars" data-criterio="sc-5" data-sub="upselling">
+                  <span class="rubrica-star" onclick="setSubStar('sc-5','upselling',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','upselling',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','upselling',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','upselling',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','upselling',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Cross-selling natural: complementos, maridaje y extras en el momento correcto</span>
+                <span class="rubrica-peso">25%</span>
+                <div class="rubrica-stars" data-criterio="sc-5" data-sub="crossselling">
+                  <span class="rubrica-star" onclick="setSubStar('sc-5','crossselling',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','crossselling',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','crossselling',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','crossselling',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','crossselling',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Oferta de postre y digestivo antes de presentar la cuenta — con descripción</span>
+                <span class="rubrica-peso">25%</span>
+                <div class="rubrica-stars" data-criterio="sc-5" data-sub="postre">
+                  <span class="rubrica-star" onclick="setSubStar('sc-5','postre',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','postre',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','postre',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','postre',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','postre',5,this)">★</span>
+                </div>
+              </div>
+              <div class="rubrica-item">
+                <span class="rubrica-texto">Tono consultivo, sin presión, usando lenguaje de recomendación genuina</span>
+                <span class="rubrica-peso">25%</span>
+                <div class="rubrica-stars" data-criterio="sc-5" data-sub="tono">
+                  <span class="rubrica-star" onclick="setSubStar('sc-5','tono',1,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','tono',2,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','tono',3,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','tono',4,this)">★</span><span class="rubrica-star" onclick="setSubStar('sc-5','tono',5,this)">★</span>
+                </div>
+              </div>
+            </div>
+            <textarea class="sc-obs" id="obs-sc-5" placeholder="Observaciones sobre venta sugestiva y técnica comercial…"></textarea>
+          </div>
+        </div>
+
+      </div><!-- /salon-left -->
+
+      <!-- DERECHA: Resumen + envío salón -->
+      <div class="salon-right">
+        <div class="eval-header">
+          <div class="eval-title">Resumen · Salón</div>
+          <div class="eval-score-badge" id="salon-global">—</div>
+        </div>
+        <div style="padding:16px;">
+
+          <!-- KPIs del salón -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+            <div class="res-cell"><span class="res-lbl">Criterios</span><span class="res-val" id="s-count">0/5</span></div>
+            <div class="res-cell"><span class="res-lbl">Promedio</span><span class="res-val" id="s-avg">—</span></div>
+            <div class="res-cell"><span class="res-lbl">Calificación</span><span class="res-val" id="s-letra" style="font-size:26px">—</span></div>
+            <div class="res-cell"><span class="res-lbl">Nivel</span><span class="res-val" id="s-nivel" style="font-size:12px;letter-spacing:1px">—</span></div>
+          </div>
+
+          <!-- Semáforo -->
+          <div class="semaforo" style="margin-bottom:10px;">
+            <div class="sem-dot" style="background:var(--red)"    id="ssem-critico"></div>
+            <div class="sem-dot" style="background:var(--orange)" id="ssem-deficiente"></div>
+            <div class="sem-dot" style="background:var(--yellow)" id="ssem-regular"></div>
+            <div class="sem-dot" style="background:var(--green)"  id="ssem-bueno"></div>
+            <div class="sem-dot" style="background:var(--green2)" id="ssem-excelente"></div>
+          </div>
+          <div class="nivel-bar" style="margin-bottom:16px;"><div class="nivel-needle" id="snivel-needle" style="left:50%"></div></div>
+
+          <!-- Detalle por criterio -->
+          <div class="panel-block" style="background:var(--surface);border:1px solid var(--border);padding:14px;margin-bottom:12px;">
+            <div class="panel-title">Desglose por Criterio</div>
+            <div id="salon-desglose" style="display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+
+          <!-- Tiempos capturados -->
+          <div class="panel-block" style="background:var(--surface);border:1px solid var(--border);padding:14px;margin-bottom:12px;">
+            <div class="panel-title">Tiempos de Servicio</div>
+            <div id="tiempos-capturados" style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--text2);">
+              <div style="color:var(--text3);font-size:10px;">Usa los botones del timer para registrar cada etapa.</div>
+            </div>
+          </div>
+
+          <!-- Conclusión y envío -->
+          <div class="panel-block" style="background:var(--surface);border:1px solid var(--border);padding:14px;">
+            <div class="panel-title">Dictamen · Firma · Envío</div>
+            <textarea class="concl" id="s-conclusion" style="height:80px;" placeholder="Dictamen final: fortalezas, áreas de oportunidad y plan de acción..."></textarea>
+            <div class="firmas">
+              <div class="firma">
+                <div class="firma-lbl">Auditor DMZ</div>
+                <input class="firma-inp" id="s-fa" placeholder="Nombre completo">
+              </div>
+              <div class="firma">
+                <div class="firma-lbl">Mesero / Responsable</div>
+                <input class="firma-inp" id="s-fc" placeholder="Nombre completo">
+              </div>
+            </div>
+            <div class="sig-wrap" style="margin-top:10px;">
+              <canvas class="sig-canvas" id="s-sig-canvas" width="280" height="56"></canvas>
+              <div class="sig-actions"><button class="sig-btn" onclick="clearSSig()">Limpiar firma</button></div>
+            </div>
+            <div class="submit-status" id="s-submit-status">
+              <div class="spinner" id="s-spinner"></div>
+              <span id="s-submit-msg">Procesando...</span>
+            </div>
+            <button class="btn-act solid" id="s-btn-submit" onclick="submitSalon()" style="margin-top:10px;">Enviar Evaluación de Salón</button>
+            <button class="btn-act outline" onclick="limpiarSalon()">Nueva Evaluación</button>
+          </div>
+
+        </div>
+      </div><!-- /salon-right -->
+
+    </div>
+  </div>
+
+</div><!-- /main-content -->
+
+<script>
+'use strict';
+
+/* ── SEGURIDAD ── */
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if (e.key==='F12' || (e.ctrlKey&&['u','s','a'].includes(e.key.toLowerCase())) ||
+      (e.ctrlKey&&e.shiftKey&&['i','j'].includes(e.key.toLowerCase()))) {
+    e.preventDefault(); return false;
+  }
+});
+
+/* ── SESSION ── */
+const SESSION = (() => {
+  const at  = sessionStorage.getItem('racreaa_at');
+  const op  = JSON.parse(sessionStorage.getItem('racreaa_op')||'null');
+  const ten = JSON.parse(sessionStorage.getItem('racreaa_tenant')||'null');
+  // Para demo sin login previo
+  if (!at) return { token: null, operator: { full_name:'Mario De La Mora', role:'admin' }, tenant: { slug:'dmz', name:'De La Mora Zumarán Kitchen Support', plan:'enterprise' } };
+  return { token: at, operator: op, tenant: ten };
+})();
+
+const TOKEN    = SESSION.token;
+const OPERATOR = SESSION.operator;
+const TENANT   = SESSION.tenant;
+
+// Cargar info de sesión en UI
+if (OPERATOR) {
+  document.getElementById('session-name').textContent = OPERATOR.full_name || '—';
+  document.getElementById('session-role').textContent = OPERATOR.role || '—';
+  document.getElementById('sf-tenant').textContent = TENANT?.slug || '—';
+  document.getElementById('sf-session').textContent = (TOKEN||'demo-session').slice(0,20)+'…';
+}
+
+function logout() {
+  if (!confirm('¿Cerrar sesión?')) return;
+  fetch('/api/auth/logout', { method:'POST', credentials:'include',
+    headers:{ 'Authorization': TOKEN?`Bearer ${TOKEN}`:'', 'Content-Type':'application/json' },
+    body: JSON.stringify({ all_devices: false })
+  }).finally(() => {
+    sessionStorage.clear();
+    window.location.href = '/frontend/login.html';
+  });
+}
+
+/* ── NAVEGACIÓN ── */
+const VIEWS = ['dashboard','evaluacion','salon','historial','ajustes'];
+function showView(name) {
+  VIEWS.forEach(v => {
+    document.getElementById(`view-${v}`).classList.toggle('active', v===name);
+    document.getElementById(`nav-${v}`).classList.toggle('active', v===name);
+  });
+  document.getElementById('view-title').textContent =
+    { dashboard:'Dashboard', evaluacion:'Nueva Evaluación', salon:'Evaluación de Salón', historial:'Historial', ajustes:'Ajustes' }[name] || '';
+  if (name==='dashboard') loadDashboard();
+  if (name==='historial') { currentPage=1; loadHistorial(); }
+  if (name==='ajustes')   loadAjustes();
+  if (name==='salon')     initSalonTimer();
+}
+
+/* ── GPS ── */
+let currentGPS = null;
+function initGPS() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.watchPosition(pos => {
+    currentGPS = { lat:pos.coords.latitude, lng:pos.coords.longitude, accuracy:pos.coords.accuracy, timestamp:pos.timestamp };
+    const dot1 = document.getElementById('gps-dot-tb');
+    const dot2 = document.getElementById('gps-micro-dot');
+    const coords = `${currentGPS.lat.toFixed(5)}, ${currentGPS.lng.toFixed(5)}`;
+    if(dot1){ dot1.className='gps-dot-tb active'; }
+    if(dot2){ dot2.className='gps-micro-dot active'; }
+    document.getElementById('gps-status-tb').textContent = 'GPS';
+    document.getElementById('gps-micro-text').textContent = 'GPS activo';
+    document.getElementById('gps-coords-tb').textContent  = coords;
+    document.getElementById('gps-micro-coords').textContent = coords + ' ±'+Math.round(pos.coords.accuracy)+'m';
+  }, () => {
+    document.getElementById('gps-dot-tb').className='gps-dot-tb error';
+    document.getElementById('gps-status-tb').textContent = 'Sin GPS';
+  }, { enableHighAccuracy:true, timeout:15000, maximumAge:5000 });
+}
+initGPS();
+
+/* ── RELOJ EN TIEMPO REAL ── */
+let arrivedAt = null;
+const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+function updateClock() {
+  const now = new Date();
+  const hh  = String(now.getHours()).padStart(2,'0');
+  const mm  = String(now.getMinutes()).padStart(2,'0');
+  const ss  = String(now.getSeconds()).padStart(2,'0');
+  const el  = document.getElementById('clock-time');
+  const ed  = document.getElementById('clock-date');
+  if (el) el.textContent = `${hh}:${mm}:${ss}`;
+  if (ed) ed.textContent = `${DIAS[now.getDay()]} ${now.getDate()} ${MESES[now.getMonth()]} ${now.getFullYear()}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ── HELPERS DE NIVEL ── */
+const NIVELES_MAP = {
+  excelente: { color:'var(--green2)', lt:'var(--green2-lt)', hex:'#1A5E3A', label:'Excelente' },
+  bueno:     { color:'var(--green)',  lt:'var(--green-lt)',  hex:'#2E7D52', label:'Bueno' },
+  regular:   { color:'var(--yellow)', lt:'var(--yellow-lt)', hex:'#A07820', label:'Regular' },
+  deficiente:{ color:'var(--orange)', lt:'var(--orange-lt)', hex:'#C06020', label:'Deficiente' },
+  critico:   { color:'var(--red)',    lt:'var(--red-lt)',    hex:'#B83232', label:'Crítico' },
+};
+function getNivel(score) {
+  if(score>=85) return NIVELES_MAP.excelente;
+  if(score>=70) return NIVELES_MAP.bueno;
+  if(score>=55) return NIVELES_MAP.regular;
+  if(score>=40) return NIVELES_MAP.deficiente;
+  return NIVELES_MAP.critico;
+}
+function getNivelKey(score) {
+  if(score>=85) return 'excelente'; if(score>=70) return 'bueno';
+  if(score>=55) return 'regular';   if(score>=40) return 'deficiente'; return 'critico';
+}
+function getLetra(p){ if(p>=90)return'A+';if(p>=85)return'A';if(p>=80)return'B+';if(p>=70)return'B';if(p>=55)return'C';if(p>=40)return'D';return'F'; }
+
+function nivelChip(nivel) {
+  const n = NIVELES_MAP[nivel] || NIVELES_MAP.regular;
+  return `<span class="nivel-chip" style="background:${n.lt};color:${n.hex}">${n.label}</span>`;
+}
+
+function formatTS(ts) {
+  if (!ts) return '—';
+  try { return new Date(ts).toLocaleString('es-MX', {dateStyle:'short', timeStyle:'short'}); }
+  catch { return ts; }
+}
+
+/* ── CARGAR DASHBOARD ── */
+async function loadDashboard() {
+  try {
+    const headers = TOKEN ? { 'Authorization':`Bearer ${TOKEN}` } : {};
+    const res = await fetch(`/api/audits?tenant=${TENANT?.slug||'dmz'}&limit=8`, { headers });
+    if (!res.ok) throw new Error('No autorizado');
+    const data = await res.json();
+    renderDashboard(data);
+  } catch {
+    // Mostrar estado vacío si no hay datos o no hay API de listado aún
+    renderDashboard({ audits:[], total:0, avg:0, counts:{} });
+  }
+}
+
+function renderDashboard(data) {
+  const audits = data.audits || [];
+  const total  = data.total  || audits.length;
+  const avg    = data.avg    || (audits.length ? Math.round(audits.reduce((a,c)=>a+(c.global_score||0),0)/audits.length) : 0);
+  const counts = data.counts || {};
+
+  document.getElementById('kpi-total').textContent     = total;
+  document.getElementById('kpi-avg').textContent       = avg || '—';
+  document.getElementById('kpi-excelente').textContent = counts.excelente || audits.filter(a=>(a.global_score||0)>=85).length;
+  document.getElementById('kpi-regular').textContent   = counts.regular   || audits.filter(a=>{const s=a.global_score||0;return s>=55&&s<70;}).length;
+  document.getElementById('kpi-critico').textContent   = counts.critico   || audits.filter(a=>(a.global_score||0)<40).length;
+
+  document.getElementById('dash-sub').textContent =
+    `${total} auditorías · Tenant: ${TENANT?.slug||'dmz'} · ${new Date().toLocaleDateString('es-MX')}`;
+
+  const tbody = document.getElementById('dash-table-body');
+  if (!audits.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="e-icon">📋</div><div class="e-text">No hay auditorías registradas aún.<br>Crea la primera desde <b>Nueva Evaluación</b>.</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = audits.map(a => {
+    const niv = getNivel(a.global_score||0);
+    return `<tr>
+      <td class="mono">${a.id||'—'}</td>
+      <td style="font-weight:600;color:var(--text)">${a.establecimiento||'—'}</td>
+      <td>${a.auditor_name||'—'}</td>
+      <td>${a.audit_date||'—'}</td>
+      <td>${a.service_period||'—'}</td>
+      <td class="score-cell" style="color:${niv.hex}">${a.global_score||0}</td>
+      <td>${nivelChip(getNivelKey(a.global_score||0))}</td>
+      <td class="mono" style="font-size:10px">${formatTS(a.server_timestamp)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── CARGAR HISTORIAL ── */
+let allAudits = [], filteredAudits = [], currentPage = 1;
+const PAGE_SIZE = 15;
+
+async function loadHistorial() {
+  const tbody = document.getElementById('hist-table-body');
+  tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="e-icon">⏳</div><div class="e-text">Cargando...</div></div></td></tr>`;
+  try {
+    const headers = TOKEN ? { 'Authorization':`Bearer ${TOKEN}` } : {};
+    const res = await fetch(`/api/audits?tenant=${TENANT?.slug||'dmz'}&limit=200`, { headers });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    allAudits = data.audits || [];
+  } catch {
+    allAudits = [];
+  }
+  filteredAudits = [...allAudits];
+  renderHistorial();
+}
+
+function applyFilters() {
+  const search = (document.getElementById('f-search').value||'').toLowerCase();
+  const nivel  = document.getElementById('f-nivel').value;
+  const from   = document.getElementById('f-from').value;
+  const to     = document.getElementById('f-to').value;
+
+  filteredAudits = allAudits.filter(a => {
+    const estab = (a.establecimiento||'').toLowerCase();
+    if (search && !estab.includes(search)) return false;
+    if (nivel  && getNivelKey(a.global_score||0) !== nivel) return false;
+    if (from   && a.audit_date < from) return false;
+    if (to     && a.audit_date > to)   return false;
+    return true;
+  });
+  currentPage = 1;
+  renderHistorial();
+}
+
+function resetFilters() {
+  ['f-search','f-from','f-to'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('f-nivel').value='';
+  filteredAudits = [...allAudits];
+  currentPage = 1;
+  renderHistorial();
+}
+
+function changePage(dir) {
+  const totalPages = Math.ceil(filteredAudits.length / PAGE_SIZE);
+  currentPage = Math.max(1, Math.min(totalPages, currentPage + dir));
+  renderHistorial();
+}
+
+function renderHistorial() {
+  const tbody      = document.getElementById('hist-table-body');
+  const totalPages = Math.ceil(filteredAudits.length / PAGE_SIZE) || 1;
+  const start      = (currentPage - 1) * PAGE_SIZE;
+  const page       = filteredAudits.slice(start, start + PAGE_SIZE);
+
+  document.getElementById('page-info').textContent =
+    `${filteredAudits.length} resultados · Página ${currentPage} de ${totalPages}`;
+  document.getElementById('btn-prev').disabled = currentPage <= 1;
+  document.getElementById('btn-next').disabled = currentPage >= totalPages;
+
+  if (!page.length) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="e-icon">🔍</div><div class="e-text">Sin resultados para los filtros aplicados.</div></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = page.map(a => {
+    const niv    = getNivel(a.global_score||0);
+    const gpsOk  = a.gps_lat ? `✅ ${parseFloat(a.gps_lat).toFixed(4)},${parseFloat(a.gps_lng).toFixed(4)}` : '—';
+    return `<tr>
+      <td class="mono" style="font-size:10px">${a.id||'—'}</td>
+      <td style="font-weight:600;color:var(--text)">${a.establecimiento||'—'}</td>
+      <td>${a.auditor_name||'—'}</td>
+      <td>${a.audit_date||'—'}</td>
+      <td>${a.service_period||'—'}</td>
+      <td style="text-align:center;color:var(--text3);font-size:11px">${a.item_count||'—'}</td>
+      <td class="score-cell" style="color:${niv.hex}">${a.global_score||0}</td>
+      <td>${nivelChip(getNivelKey(a.global_score||0))}</td>
+      <td style="font-size:9px;font-family:monospace;color:${a.gps_lat?'var(--green)':'var(--text3)'}">${gpsOk}</td>
+      <td class="mono" style="font-size:9px">${formatTS(a.server_timestamp)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── AJUSTES ── */
+function loadAjustes() {
+  const opInfo = document.getElementById('op-info');
+  const tenInfo = document.getElementById('tenant-info');
+  if (OPERATOR) {
+    opInfo.innerHTML = [
+      ['Nombre', OPERATOR.full_name||'—'],
+      ['Email',  OPERATOR.email||'—'],
+      ['Rol',    OPERATOR.role||'—'],
+    ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;">
+      <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">${l}</span>
+      <span style="font-size:12px;font-weight:600;color:var(--text)">${v}</span>
+    </div>`).join('');
+  }
+  if (TENANT) {
+    tenInfo.innerHTML = [
+      ['Nombre', TENANT.name||'—'],
+      ['Slug',   TENANT.slug||'—'],
+      ['Plan',   (TENANT.plan||'—').toUpperCase()],
+    ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;">
+      <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">${l}</span>
+      <span style="font-size:12px;font-weight:600;color:var(--text)">${v}</span>
+    </div>`).join('');
+  }
+  const slug = TENANT?.slug||'dmz';
+  document.getElementById('login-url').textContent =
+    `${location.origin}/frontend/login.html?tenant=${slug}`;
+}
+
+/* ══════════════════════════════════════════════
+   EVALUACIÓN DE ALIMENTOS — LÓGICA COMPLETA
+   ══════════════════════════════════════════════ */
+const CRIT=[
+  {key:'presentacion',label:'Presentación'},
+  {key:'temperatura', label:'Temperatura'},
+  {key:'sabor',       label:'Sabor'},
+  {key:'textura',     label:'Textura'},
+  {key:'porcion',     label:'Porción'},
+];
+const CATS=['Entrada','Sopa','Ensalada','Platillo fuerte','Guarnición','Postre','Bebida','Antojito','Otro'];
+const NIVELES_LIST=[
+  {key:'critico',min:0,max:40},{key:'deficiente',min:40,max:55},
+  {key:'regular',min:55,max:70},{key:'bueno',min:70,max:85},{key:'excelente',min:85,max:101}
+];
+let cards=[], counter=0;
+function getNivelFromScore(p){return NIVELES_LIST.find(n=>p>=n.min&&p<n.max)||NIVELES_LIST[0];}
+function getLetraFromScore(p){if(p>=90)return'A+';if(p>=85)return'A';if(p>=80)return'B+';if(p>=70)return'B';if(p>=55)return'C';if(p>=40)return'D';return'F';}
+
+function addCard(){
+  counter++;
+  const id='c'+Date.now();
+  const data={id,num:counter,nombre:'',categoria:'',obs:'',criterios:{},evidence:[],_pct:undefined,_nivel:''};
+  CRIT.forEach(c=>data.criterios[c.key]=0);
+  cards.push(data);
+  const wrap=document.getElementById('cards-col');
+  const div=document.createElement('div');
+  div.className='platillo-card'; div.id=id;
+  const catOpts=CATS.map(c=>`<option>${c}</option>`).join('');
+  const critRows=CRIT.map(c=>`
+    <div class="criterio-row" data-crit="${c.key}">
+      <span class="crit-label">${c.label}</span>
+      <div class="stars">${[1,2,3,4,5].map(i=>`<span class="star" onclick="setStar('${id}','${c.key}',${i})">&#9733;</span>`).join('')}</div>
+      <div class="score-bar-wrap"><div class="score-bar-fill" id="b-${id}-${c.key}" style="width:0"></div></div>
+      <span class="crit-score" id="s-${id}-${c.key}">—</span>
+    </div>`).join('');
+  div.innerHTML=`
+    <button class="btn-del" onclick="delCard('${id}')">&#215;</button>
+    <div class="card-top">
+      <span class="card-num">${String(counter).padStart(2,'0')}</span>
+      <div class="card-fields">
+        <div class="field-row">
+          <input class="f-name" placeholder="Nombre del platillo" oninput="upd('${id}','nombre',this.value)">
+          <select class="f-cat" onchange="upd('${id}','categoria',this.value)">
+            <option value="">Categoría…</option>${catOpts}
+          </select>
+        </div>
+        <div class="criterios">${critRows}</div>
+      </div>
+    </div>
+    <div class="evidence-zone" id="ev-zone-${id}">
+      <button class="btn-capture" onclick="capturePhoto('${id}')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Capturar evidencia GPS
+      </button>
+    </div>
+    <div class="card-footer">
+      <textarea class="card-obs" placeholder="Observaciones…" oninput="upd('${id}','obs',this.value)"></textarea>
+      <div class="card-total">
+        <div class="total-ring" id="tr-${id}">
+          <span class="total-n" id="tn-${id}">—</span>
+          <span class="total-sub">/ 100</span>
+        </div>
+        <span class="nivel-tag" id="nt-${id}">—</span>
+      </div>
+    </div>`;
+  wrap.appendChild(div);
+  updateGlobal();
+}
+
+function setStar(id,crit,val){
+  const d=cards.find(c=>c.id===id); if(!d)return;
+  d.criterios[crit]=val;
+  const card=document.getElementById(id);
+  const row=card.querySelector(`.criterio-row[data-crit="${crit}"]`);
+  if(row) row.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('on',i<val));
+  const bar=document.getElementById(`b-${id}-${crit}`); if(bar) bar.style.width=(val*20)+'%';
+  const sc=document.getElementById(`s-${id}-${crit}`); if(sc) sc.textContent=val;
+  calcCard(d); updateGlobal();
+}
+
+function calcCard(d){
+  const vals=Object.values(d.criterios), sum=vals.reduce((a,b)=>a+b,0);
+  if(!sum)return;
+  const pct=Math.round((sum/(CRIT.length*5))*100);
+  const niv=getNivelFromScore(pct);
+  d._pct=pct; d._nivel=niv.key;
+  const nm=NIVELES_MAP[niv.key];
+  const tr=document.getElementById(`tr-${d.id}`); if(tr) tr.style.borderColor=nm.color;
+  const tn=document.getElementById(`tn-${d.id}`); if(tn) tn.textContent=pct;
+  const nt=document.getElementById(`nt-${d.id}`); if(nt){nt.textContent=nm.label;nt.style.background=nm.lt;nt.style.color=nm.hex;}
+  const card=document.getElementById(d.id); if(card) card.setAttribute('data-nivel',niv.key);
+}
+
+function upd(id,field,val){const d=cards.find(c=>c.id===id);if(d)d[field]=val;}
+
+function delCard(id){
+  cards=cards.filter(c=>c.id!==id);
+  const el=document.getElementById(id); if(el)el.remove();
+  updateGlobal();
+}
+
+function updateGlobal(){
+  const ev=cards.filter(c=>c._pct!==undefined);
+  document.getElementById('r-total').textContent=cards.length;
+  if(!ev.length){
+    ['r-prom','r-letra','r-nivel','global-num'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent='—';el.style.color='';}});
+    NIVELES_LIST.forEach(n=>{const d=document.getElementById('sem-'+n.key);if(d)d.classList.remove('active');});
+    document.getElementById('nivel-needle').style.left='50%';
+    document.getElementById('dist-list').innerHTML='';
+    document.getElementById('cs-list').innerHTML='';
+    return;
+  }
+  const avg=Math.round(ev.reduce((a,c)=>a+c._pct,0)/ev.length);
+  const niv=getNivelFromScore(avg), nm=NIVELES_MAP[niv.key];
+  document.getElementById('r-prom').textContent=avg;
+  const rl=document.getElementById('r-letra'); if(rl){rl.textContent=getLetraFromScore(avg);rl.style.color=nm.hex;}
+  const rn=document.getElementById('r-nivel'); if(rn){rn.textContent=nm.label;rn.style.color=nm.hex;}
+  document.getElementById('global-num').textContent=avg;
+  NIVELES_LIST.forEach(n=>{const d=document.getElementById('sem-'+n.key);if(d)d.classList.toggle('active',n.key===niv.key);});
+  document.getElementById('nivel-needle').style.left=avg+'%';
+  const dl=document.getElementById('dist-list'); dl.innerHTML='';
+  [...NIVELES_LIST].reverse().forEach(n=>{
+    const cnt=ev.filter(c=>c._nivel===n.key).length, pct=Math.round((cnt/ev.length)*100);
+    const nm2=NIVELES_MAP[n.key];
+    const row=document.createElement('div'); row.className='dist-row';
+    row.innerHTML=`<div class="dist-dot" style="background:${nm2.color}"></div><span class="dist-name">${nm2.label}</span><div class="dist-bw"><div class="dist-bf" style="width:${pct}%;background:${nm2.color}"></div></div><span class="dist-count">${cnt}</span><span class="dist-pct">${pct}%</span>`;
+    dl.appendChild(row);
+  });
+  const cl=document.getElementById('cs-list'); cl.innerHTML='';
+  CRIT.forEach(c=>{
+    const vals=ev.map(e=>e.criterios[c.key]).filter(v=>v>0); if(!vals.length)return;
+    const a5=(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1), pct=Math.round((a5/5)*100);
+    const row=document.createElement('div'); row.className='cs-row';
+    row.innerHTML=`<span class="cs-name">${c.label}</span><div class="cs-bw"><div class="cs-bf" style="width:${pct}%"></div></div><span class="cs-val">${a5}</span>`;
+    cl.appendChild(row);
+  });
+}
+
+/* Captura fotográfica Zero-Trust */
+async function capturePhoto(cardId){
+  const gpsAtCapture=currentGPS?{...currentGPS}:null;
+  const input=document.createElement('input');
+  input.type='file'; input.accept='image/*';
+  input.setAttribute('capture','environment');
+  input.style.display='none';
+  document.body.appendChild(input);
+  input.onchange=async(e)=>{
+    const file=e.target.files[0]; if(!file){document.body.removeChild(input);return;}
+    if(!file.type.startsWith('image/')||file.size>10*1024*1024){alert('Solo imágenes ≤10MB.');document.body.removeChild(input);return;}
+    const reader=new FileReader();
+    reader.onload=(ev)=>{
+      const base64=ev.target.result;
+      const card=cards.find(c=>c.id===cardId); if(!card)return;
+      if(!card.evidence)card.evidence=[];
+      const ev2={id:'ev-'+Date.now(),base64,mimeType:file.type,sizeBytes:file.size,capturedAt:new Date().toISOString(),gps:gpsAtCapture,gpsVerified:!!gpsAtCapture,sessionToken:TOKEN};
+      card.evidence.push(ev2);
+      const zone=document.getElementById(`ev-zone-${cardId}`); if(!zone)return;
+      const wrap=document.createElement('div'); wrap.className='evidence-thumb'; wrap.id=ev2.id;
+      const gpsLabel=ev2.gpsVerified?`${ev2.gps.lat.toFixed(5)},${ev2.gps.lng.toFixed(5)}`:'Sin GPS';
+      wrap.innerHTML=`<img src="${base64}" alt="Evidencia"><div class="gps-stamp">${gpsLabel}<br>${ev2.capturedAt.slice(11,19)}</div><button class="del-thumb" onclick="removeEv('${cardId}','${ev2.id}')">×</button>`;
+      zone.appendChild(wrap);
+    };
+    reader.readAsDataURL(file);
+    document.body.removeChild(input);
+  };
+  if(!gpsAtCapture&&!confirm('Sin GPS disponible. ¿Continuar?')){document.body.removeChild(input);return;}
+  input.click();
+}
+function removeEv(cardId,evId){
+  const card=cards.find(c=>c.id===cardId); if(!card)return;
+  card.evidence=(card.evidence||[]).filter(e=>e.id!==evId);
+  const el=document.getElementById(evId); if(el)el.remove();
+}
+
+/* Firma digital */
+(function(){
+  const canvas=document.getElementById('sig-canvas'); if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let drawing=false, lx=0, ly=0;
+  ctx.strokeStyle='#2C2A24'; ctx.lineWidth=1.5; ctx.lineCap='round'; ctx.lineJoin='round';
+  function pos(e){const r=canvas.getBoundingClientRect(),t=e.touches?e.touches[0]:e;return[(t.clientX-r.left)*(canvas.width/r.width),(t.clientY-r.top)*(canvas.height/r.height)];}
+  function start(e){e.preventDefault();drawing=true;[lx,ly]=pos(e);}
+  function draw(e){if(!drawing)return;e.preventDefault();const[x,y]=pos(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(x,y);ctx.stroke();[lx,ly]=[x,y];}
+  function stop(){drawing=false;}
+  canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',draw);canvas.addEventListener('mouseup',stop);canvas.addEventListener('mouseleave',stop);
+  canvas.addEventListener('touchstart',start,{passive:false});canvas.addEventListener('touchmove',draw,{passive:false});canvas.addEventListener('touchend',stop);
+})();
+function clearSig(){const c=document.getElementById('sig-canvas');c.getContext('2d').clearRect(0,0,c.width,c.height);}
+function getSig(){const c=document.getElementById('sig-canvas');const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;return d.some(v=>v!==0)?c.toDataURL('image/png'):null;}
+
+/* Submit */
+function showStatus(type,msg){
+  const s=document.getElementById('submit-status'),m=document.getElementById('submit-msg'),sp=document.getElementById('spinner');
+  s.className=`submit-status visible ${type}`; m.textContent=msg;
+  if(sp)sp.style.display=type==='loading'?'block':'none';
+}
+
+async function submitAudit(){
+  const btn=document.getElementById('btn-submit');
+  if(!cards.length){showStatus('error','Agregue al menos un platillo.');return;}
+  const evCards=cards.filter(c=>c._pct!==undefined);
+  if(!evCards.length){showStatus('error','Califique al menos un platillo.');return;}
+  const auditor=document.getElementById('fa').value.trim();
+  if(!auditor){showStatus('error','"Auditor DMZ" es obligatorio.');return;}
+  if(!currentGPS&&!confirm('Sin GPS verificado. ¿Continuar?'))return;
+
+  const avg=Math.round(evCards.reduce((a,c)=>a+c._pct,0)/evCards.length);
+  const payload={
+    sessionToken: TOKEN||'demo-session',
+    submittedAt:  new Date().toISOString(),
+    gpsAtSubmission: currentGPS,
+    establecimiento: document.getElementById('m-est').value.trim(),
+    auditor:         document.getElementById('m-aud').value.trim(),
+    fecha:           document.getElementById('m-fecha').value,
+    servicio:        document.getElementById('m-srv').value.trim(),
+    auditorFirma:    auditor,
+    chefFirma:       document.getElementById('fc').value.trim(),
+    signatureImage:  getSig(),
+    conclusion:      document.getElementById('conclusion').value.trim(),
+    globalScore:     avg,
+    items: cards.map(c=>({
+      id:c.id,num:c.num,nombre:c.nombre,categoria:c.categoria,
+      criterios:c.criterios,score:c._pct||0,nivel:c._nivel,
+      observaciones:c.obs,
+      evidence:(c.evidence||[]).map(e=>({id:e.id,base64:e.base64,mimeType:e.mimeType,sizeBytes:e.sizeBytes,capturedAt:e.capturedAt,gps:e.gps,gpsVerified:e.gpsVerified}))
+    }))
+  };
+
+  btn.disabled=true;
+  showStatus('loading','Cifrando y enviando evaluación...');
+
+  try {
+    const res=await fetch('/api/submit-audit',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':TOKEN?`Bearer ${TOKEN}`:'','X-Client-GPS':currentGPS?`${currentGPS.lat},${currentGPS.lng}`:'unavailable','X-Request-ID':'REQ-'+Date.now().toString(36).toUpperCase()},
+      body:JSON.stringify(payload),
+      credentials:'include'
+    });
+    const result=await res.json();
+    if(res.ok&&result.success){
+      showStatus('success',`✅ Registrada — ID: ${result.auditId}`);
+      setTimeout(()=>{ showView('historial'); loadHistorial(); },2000);
+    } else {
+      showStatus('error',result.message||`Error ${res.status}`);
+      btn.disabled=false;
+    }
+  } catch(err){
+    showStatus('error','Error de red. Verifique su conexión.');
+    btn.disabled=false;
+  }
+}
+
+function limpiar(){
+  if(!confirm('¿Nueva evaluación? Se perderán los datos no enviados.'))return;
+  cards=[]; counter=0;
+  document.getElementById('cards-col').innerHTML='';
+  ['m-est','m-aud','m-srv','conclusion','fa','fc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('m-fecha').value='';
+  clearSig();
+  document.getElementById('btn-submit').disabled=false;
+  document.getElementById('submit-status').className='submit-status';
+  updateGlobal();
+}
+
+/* ── INIT ── */
+document.getElementById('m-fecha').value = new Date().toISOString().split('T')[0];
+addCard(); addCard(); addCard();
+loadDashboard();
+loadAjustes();
+
+/* ══════════════════════════════════════════════════
+   EVALUACIÓN DE SALÓN — LÓGICA COMPLETA
+   ══════════════════════════════════════════════════ */
+
+/* Estructura de datos del salón */
+const SALON_CRITERIOS = [
+  { id:'sc-1', label:'Saludo y Bienvenida',   subs:['tiempo','calidad','presentacion','menu'] },
+  { id:'sc-2', label:'Secuencia de Servicio', subs:['flujo','timing','protocolo','checkback'] },
+  { id:'sc-3', label:'Conocimiento de Menú',  subs:['ingredientes','alergenos','maridaje','especiales'] },
+  { id:'sc-4', label:'Cliente Redondo',        subs:['anticipacion','quejas','cierre','personalizacion'] },
+  { id:'sc-5', label:'Venta Sugestiva',        subs:['upselling','crossselling','postre','tono'] },
+];
+
+/* Estado de calificaciones del salón */
+const salonScores = {};
+SALON_CRITERIOS.forEach(c => {
+  salonScores[c.id] = {};
+  c.subs.forEach(s => { salonScores[c.id][s] = 0; });
+});
+
+/* Tiempos del servicio */
+const tiemposServicio = {};
+let timerInterval = null;
+let timerStart    = null;
+let timerRunning  = false;
+
+function initSalonTimer() {
+  // Inicializar fecha del salón
+  const sf = document.getElementById('s-fecha');
+  if (sf && !sf.value) sf.value = new Date().toISOString().split('T')[0];
+  // Firma canvas
+  initSSig();
+}
+
+/* Timer de servicio */
+function marcarMomento(fase) {
+  const now = new Date();
+  if (!timerStart) {
+    timerStart = now;
+    timerRunning = true;
+    timerInterval = setInterval(updateTimer, 1000);
+  }
+  tiemposServicio[fase] = now;
+
+  // Actualizar botón activo
+  ['llegada','orden','alimentos','cuenta'].forEach(f => {
+    const btn = document.getElementById('btn-timer-'+f);
+    if (btn) btn.classList.toggle('active', f === fase);
+  });
+
+  // Mostrar tiempos capturados
+  renderTiempos();
+
+  // Actualizar phase label
+  const labels = { llegada:'Llegada del cliente', orden:'Toma de orden', alimentos:'Entrega de alimentos', cuenta:'Solicitud de cuenta' };
+  const el = document.getElementById('timer-phase');
+  if (el) el.textContent = labels[fase] || 'Tiempo de servicio';
+}
+
+function updateTimer() {
+  if (!timerStart) return;
+  const elapsed = Math.floor((Date.now() - timerStart) / 1000);
+  const mm = String(Math.floor(elapsed / 60)).padStart(2,'0');
+  const ss = String(elapsed % 60).padStart(2,'0');
+  const el = document.getElementById('salon-timer');
+  if (el) el.textContent = `${mm}:${ss}`;
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null; timerStart = null; timerRunning = false;
+  Object.keys(tiemposServicio).forEach(k => delete tiemposServicio[k]);
+  const el = document.getElementById('salon-timer');
+  if (el) el.textContent = '00:00';
+  const ph = document.getElementById('timer-phase');
+  if (ph) ph.textContent = 'Tiempo de servicio';
+  ['llegada','orden','alimentos','cuenta'].forEach(f => {
+    const btn = document.getElementById('btn-timer-'+f);
+    if (btn) btn.classList.remove('active');
+  });
+  const ba = document.getElementById('btn-timer-llegada');
+  if (ba) ba.classList.add('active');
+  renderTiempos();
+}
+
+function renderTiempos() {
+  const cont = document.getElementById('tiempos-capturados');
+  if (!cont) return;
+  const fases = [
+    { key:'llegada',   label:'Llegada del cliente',      std:'—' },
+    { key:'orden',     label:'Toma de orden',             std:'≤ 3 min después de llegada' },
+    { key:'alimentos', label:'Entrega de alimentos',      std:'≤ 18 min para plato fuerte' },
+    { key:'cuenta',    label:'Entrega de cuenta',         std:'≤ 2 min de solicitarla' },
+  ];
+  const keys = Object.keys(tiemposServicio);
+  if (!keys.length) {
+    cont.innerHTML = '<div style="color:var(--text3);font-size:10px;">Usa los botones del timer para registrar cada etapa del servicio.</div>';
+    return;
+  }
+
+  cont.innerHTML = fases.filter(f => tiemposServicio[f.key]).map(f => {
+    const t = tiemposServicio[f.key];
+    const hhmm = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}`;
+    // Calcular delta desde llegada si existe
+    let delta = '';
+    if (f.key !== 'llegada' && tiemposServicio.llegada) {
+      const secs = Math.floor((t - tiemposServicio.llegada) / 1000);
+      const dm = Math.floor(secs/60), ds = secs%60;
+      delta = ` <span style="color:var(--text3)">+${dm}m${ds}s desde llegada</span>`;
+    }
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);">
+      <span style="font-weight:600">${f.label}</span>
+      <span style="font-family:monospace;color:var(--gold-dim)">${hhmm}${delta}</span>
+    </div>`;
+  }).join('');
+}
+
+/* Accordion de criterios */
+function toggleCriterio(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('expanded');
+}
+
+/* Calificación de sub-rúbricas */
+function setSubStar(criterioId, subId, val, starEl) {
+  salonScores[criterioId][subId] = val;
+  // Pintar estrellas del sub
+  const container = starEl.parentElement;
+  container.querySelectorAll('.rubrica-star').forEach((s, i) => s.classList.toggle('on', i < val));
+  // Calcular promedio del criterio
+  calcCriterio(criterioId);
+}
+
+function calcCriterio(criterioId) {
+  const scores = salonScores[criterioId];
+  const vals   = Object.values(scores).filter(v => v > 0);
+  if (!vals.length) return;
+  const avg = vals.reduce((a,b)=>a+b,0) / vals.length;
+  const rounded = Math.round(avg * 10) / 10;
+
+  // Actualizar ring
+  const ring  = document.getElementById(`ring-${criterioId}`);
+  const scoreEl = document.getElementById(`score-${criterioId}`);
+  const card  = document.getElementById(criterioId);
+  const niv   = getNivel(rounded * 20); // escala 1-5 → 0-100
+
+  if (scoreEl) scoreEl.textContent = rounded.toFixed(1);
+  if (ring)   ring.style.borderColor = niv.color;
+  if (card)   card.setAttribute('data-score', Math.round(rounded));
+
+  updateSalonGlobal();
+}
+
+function updateSalonGlobal() {
+  const criterioScores = SALON_CRITERIOS.map(c => {
+    const vals = Object.values(salonScores[c.id]).filter(v => v > 0);
+    return vals.length ? vals.reduce((a,b)=>a+b,0) / vals.length : null;
+  }).filter(v => v !== null);
+
+  const count = criterioScores.length;
+  const el_count = document.getElementById('s-count');
+  if (el_count) el_count.textContent = `${count}/5`;
+
+  if (!count) return;
+
+  const avg5 = criterioScores.reduce((a,b)=>a+b,0) / count;
+  const avg100 = Math.round(avg5 * 20);
+  const niv = getNivel(avg100);
+  const nm  = NIVELES_MAP[getNivelKey(avg100)];
+
+  document.getElementById('salon-global').textContent = avg100;
+  const sa = document.getElementById('s-avg'); if(sa){sa.textContent=avg5.toFixed(1)+'/5';}
+  const sl = document.getElementById('s-letra'); if(sl){sl.textContent=getLetra(avg100);sl.style.color=nm.hex;}
+  const sn = document.getElementById('s-nivel'); if(sn){sn.textContent=nm.label;sn.style.color=nm.hex;}
+
+  // Semáforo
+  ['critico','deficiente','regular','bueno','excelente'].forEach(k => {
+    const dot = document.getElementById('ssem-'+k);
+    if(dot) dot.classList.toggle('active', k === getNivelKey(avg100));
+  });
+  const needle = document.getElementById('snivel-needle');
+  if(needle) needle.style.left = avg100 + '%';
+
+  // Desglose
+  const desg = document.getElementById('salon-desglose');
+  if (desg) {
+    desg.innerHTML = SALON_CRITERIOS.map(c => {
+      const vals = Object.values(salonScores[c.id]).filter(v=>v>0);
+      if (!vals.length) return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:11px;color:var(--text3);flex:1">${c.label}</span>
+        <span style="font-size:10px;color:var(--text3)">Sin calificar</span>
+      </div>`;
+      const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+      const pct = Math.round((avg/5)*100);
+      const nm2 = NIVELES_MAP[getNivelKey(pct)];
+      return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:11px;color:var(--text2);flex:1">${c.label}</span>
+        <div style="width:60px;height:3px;background:var(--surface2);flex-shrink:0;">
+          <div style="width:${pct}%;height:100%;background:${nm2.color};transition:width .3s"></div>
+        </div>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:${nm2.hex};min-width:24px;text-align:right">${avg.toFixed(1)}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+/* Firma del salón */
+function initSSig() {
+  const canvas = document.getElementById('s-sig-canvas'); if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let drawing=false,lx=0,ly=0;
+  ctx.strokeStyle='#2C2A24';ctx.lineWidth=1.5;ctx.lineCap='round';ctx.lineJoin='round';
+  function pos(e){const r=canvas.getBoundingClientRect(),t=e.touches?e.touches[0]:e;return[(t.clientX-r.left)*(canvas.width/r.width),(t.clientY-r.top)*(canvas.height/r.height)];}
+  function start(e){e.preventDefault();drawing=true;[lx,ly]=pos(e);}
+  function draw(e){if(!drawing)return;e.preventDefault();const[x,y]=pos(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(x,y);ctx.stroke();[lx,ly]=[x,y];}
+  function stop(){drawing=false;}
+  canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',draw);canvas.addEventListener('mouseup',stop);canvas.addEventListener('mouseleave',stop);
+  canvas.addEventListener('touchstart',start,{passive:false});canvas.addEventListener('touchmove',draw,{passive:false});canvas.addEventListener('touchend',stop);
+}
+function clearSSig(){const c=document.getElementById('s-sig-canvas');if(c)c.getContext('2d').clearRect(0,0,c.width,c.height);}
+function getSSig(){const c=document.getElementById('s-sig-canvas');if(!c)return null;const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;return d.some(v=>v!==0)?c.toDataURL('image/png'):null;}
+
+/* Submit salón */
+function showSStat(type,msg){
+  const s=document.getElementById('s-submit-status'),m=document.getElementById('s-submit-msg'),sp=document.getElementById('s-spinner');
+  s.className=`submit-status visible ${type}`;m.textContent=msg;
+  if(sp)sp.style.display=type==='loading'?'block':'none';
+}
+
+async function submitSalon() {
+  const btn = document.getElementById('s-btn-submit');
+  const auditor = document.getElementById('s-fa').value.trim();
+  if (!auditor) { showSStat('error','El campo "Auditor DMZ" es obligatorio.'); return; }
+
+  const criterioScores = SALON_CRITERIOS.map(c => {
+    const vals = Object.values(salonScores[c.id]).filter(v=>v>0);
+    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+  });
+  const filled = criterioScores.filter(v=>v>0).length;
+  if (!filled) { showSStat('error','Califique al menos un criterio de servicio.'); return; }
+
+  const globalAvg = criterioScores.filter(v=>v>0).reduce((a,b)=>a+b,0) / filled;
+  const globalScore = Math.round(globalAvg * 20);
+
+  const payload = {
+    tipo:           'salon',
+    sessionToken:   TOKEN || 'demo-session',
+    submittedAt:    new Date().toISOString(),
+    gpsAtSubmission: currentGPS,
+    establecimiento: document.getElementById('s-est').value.trim(),
+    auditor:         document.getElementById('s-aud').value.trim(),
+    fecha:           document.getElementById('s-fecha').value,
+    servicio:        document.getElementById('s-turno').value,
+    mesa:            document.getElementById('s-mesa').value.trim(),
+    mesero:          document.getElementById('s-mesero').value.trim(),
+    auditorFirma:    auditor,
+    chefFirma:       document.getElementById('s-fc').value.trim(),
+    signatureImage:  getSSig(),
+    conclusion:      document.getElementById('s-conclusion').value.trim(),
+    globalScore,
+    tiemposServicio: Object.fromEntries(
+      Object.entries(tiemposServicio).map(([k,v])=>[k,v.toISOString()])
+    ),
+    items: SALON_CRITERIOS.map((c,i) => ({
+      id:      c.id,
+      num:     i+1,
+      nombre:  c.label,
+      categoria: 'Servicio de Salón',
+      criterios: salonScores[c.id],
+      score:   Math.round(criterioScores[i]*20),
+      nivel:   getNivelKey(Math.round(criterioScores[i]*20)),
+      observaciones: (document.getElementById(`obs-${c.id}`)?.value||'').trim(),
+    }))
+  };
+
+  btn.disabled = true;
+  showSStat('loading','Enviando evaluación de salón...');
+
+  try {
+    const res = await fetch('/api/submit-audit', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization': TOKEN?`Bearer ${TOKEN}`:'',
+        'X-Client-GPS': currentGPS?`${currentGPS.lat},${currentGPS.lng}`:'unavailable',
+        'X-Request-ID': 'SALON-'+Date.now().toString(36).toUpperCase() },
+      body: JSON.stringify(payload),
+      credentials: 'include'
+    });
+    const result = await res.json();
+    if (res.ok && result.success) {
+      showSStat('success', `✅ Registrada — ID: ${result.auditId}`);
+      setTimeout(() => { showView('historial'); loadHistorial(); }, 2000);
+    } else {
+      showSStat('error', result.message || `Error ${res.status}`);
+      btn.disabled = false;
+    }
+  } catch {
+    showSStat('error','Error de red. Verifique su conexión.');
+    btn.disabled = false;
+  }
+}
+
+function limpiarSalon() {
+  if (!confirm('¿Iniciar nueva evaluación de salón?')) return;
+  SALON_CRITERIOS.forEach(c => {
+    c.subs.forEach(s => { salonScores[c.id][s] = 0; });
+    const card = document.getElementById(c.id);
+    if (card) {
+      card.setAttribute('data-score','');
+      card.classList.remove('expanded');
+      const ring = document.getElementById(`ring-${c.id}`);
+      if (ring) ring.style.borderColor = '';
+      const sn = document.getElementById(`score-${c.id}`);
+      if (sn) sn.textContent = '—';
+      card.querySelectorAll('.rubrica-star').forEach(s => s.classList.remove('on'));
+    }
+    const obs = document.getElementById(`obs-${c.id}`);
+    if (obs) obs.value = '';
+  });
+  ['s-est','s-aud','s-turno','s-mesa','s-mesero','s-conclusion','s-fa','s-fc'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('s-fecha').value = new Date().toISOString().split('T')[0];
+  clearSSig();
+  resetTimer();
+  document.getElementById('s-btn-submit').disabled = false;
+  document.getElementById('s-submit-status').className = 'submit-status';
+  // Reset resumen
+  ['salon-global','s-avg','s-letra','s-nivel'].forEach(id => {
+    const el = document.getElementById(id); if(el){el.textContent='—';el.style.color='';}
+  });
+  document.getElementById('s-count').textContent = '0/5';
+  document.getElementById('salon-desglose').innerHTML = '';
+  ['critico','deficiente','regular','bueno','excelente'].forEach(k => {
+    const d = document.getElementById('ssem-'+k); if(d) d.classList.remove('active');
+  });
+  document.getElementById('snivel-needle').style.left = '50%';
+}
+</script>
+</body>
+</html>

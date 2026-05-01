@@ -18,6 +18,11 @@
     }
   ],
   "rewrites": [
-    { "source": "/logo-dmz.jpg", "destination": "/public/logo-dmz.jpg" }
+    { "source": "/frontend/dashboard.html",               "destination": "/public/dashboard.html" },
+    { "source": "/frontend/login.html",                   "destination": "/public/login.html" },
+    { "source": "/frontend/calificacion-alimentos.html",  "destination": "/public/calificacion-alimentos.html" },
+    { "source": "/dashboard",                             "destination": "/public/dashboard.html" },
+    { "source": "/login",                                 "destination": "/public/login.html" },
+    { "source": "/audit",                                 "destination": "/public/calificacion-alimentos.html" }
   ]
 }
