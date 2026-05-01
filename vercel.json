@@ -22,21 +22,12 @@
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
         { "key": "Service-Worker-Allowed", "value": "/" }
       ]
-    },
-    {
-      "source": "/manifest.json",
-      "headers": [
-        { "key": "Content-Type", "value": "application/manifest+json" }
-      ]
     }
   ],
   "rewrites": [
-    { "source": "/",          "destination": "/public/login.html" },
-    { "source": "/login",     "destination": "/public/login.html" },
-    { "source": "/dashboard", "destination": "/public/dashboard.html" },
-    { "source": "/app",       "destination": "/public/app.html" },
-    { "source": "/frontend/dashboard.html",              "destination": "/public/dashboard.html" },
-    { "source": "/frontend/login.html",                  "destination": "/public/login.html" },
-    { "source": "/frontend/calificacion-alimentos.html", "destination": "/public/calificacion-alimentos.html" }
+    { "source": "/",          "destination": "/login.html" },
+    { "source": "/login",     "destination": "/login.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/app",       "destination": "/app.html" }
   ]
 }
