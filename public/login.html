@@ -393,15 +393,8 @@ body {
       <div class="alert" id="alert" role="alert"></div>
 
       <!-- Campo: Organización -->
-      <div class="field">
-        <label class="field-label" for="f-tenant">Organización (slug)</label>
-        <input class="field-input" id="f-tenant" type="text"
-               placeholder="ej. nook-aruba"
-               autocomplete="organization"
-               autocapitalize="none"
-               spellcheck="false">
-        <span class="field-error" id="err-tenant">Ingrese el identificador de su organización.</span>
-      </div>
+      <!-- Tenant fijo — no visible para el usuario -->
+      <input type="hidden" id="f-tenant" value="dmz">
 
       <!-- Campo: Email -->
       <div class="field">
@@ -484,16 +477,6 @@ function validateForm() {
   const tenant = document.getElementById('f-tenant').value.trim();
   const email  = document.getElementById('f-email').value.trim();
   const pass   = document.getElementById('f-pass').value;
-
-  // Tenant
-  const errT = document.getElementById('err-tenant');
-  if (!tenant || !/^[a-z0-9-]{2,64}$/.test(tenant)) {
-    document.getElementById('f-tenant').classList.add('error');
-    errT.classList.add('visible'); valid = false;
-  } else {
-    document.getElementById('f-tenant').classList.remove('error');
-    errT.classList.remove('visible');
-  }
 
   // Email
   const errE = document.getElementById('err-email');
