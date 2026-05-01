@@ -116,7 +116,7 @@ module.exports = async function handler(req, res) {
     }
 
     const opRes = await client.query(
-      `SELECT id,tenant_id,email,full_name,role,password_hash,is_active FROM racreaa.operators WHERE email=$1 AND tenant_id=$2 LIMIT 1`,
+      `SELECT id,tenant_id,email,full_name,role,password_hash,is_active,must_change_password FROM racreaa.operators WHERE email=$1 AND tenant_id=$2 LIMIT 1`,
       [email, tenant.id]);
     const op = opRes.rows[0];
     if (!op) {
@@ -156,6 +156,7 @@ module.exports = async function handler(req, res) {
     res.setHeader('Set-Cookie', rtCookie(raw));
     return res.status(200).json({
       success:true, access_token:token, token_type:'Bearer', expires_in:JWT_EXPIRY,
+      must_change_password: !!op.must_change_password,
       operator:{ id:op.id, full_name:op.full_name, email:op.email, role:op.role },
       tenant:{ id:tenant.id, slug:tenant.slug, name:tenant.name, brand_name:tenant.brand_name, plan:tenant.plan },
     });
