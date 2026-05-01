@@ -15,14 +15,24 @@
         { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
         { "key": "Referrer-Policy", "value": "no-referrer" }
       ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/manifest+json" }
+      ]
     }
   ],
   "rewrites": [
-    { "source": "/frontend/dashboard.html",               "destination": "/public/dashboard.html" },
-    { "source": "/frontend/login.html",                   "destination": "/public/login.html" },
-    { "source": "/frontend/calificacion-alimentos.html",  "destination": "/public/calificacion-alimentos.html" },
-    { "source": "/dashboard",                             "destination": "/public/dashboard.html" },
-    { "source": "/login",                                 "destination": "/public/login.html" },
-    { "source": "/audit",                                 "destination": "/public/calificacion-alimentos.html" }
+    { "source": "/frontend/dashboard.html",              "destination": "/public/dashboard.html" },
+    { "source": "/frontend/login.html",                  "destination": "/public/login.html" },
+    { "source": "/frontend/calificacion-alimentos.html", "destination": "/public/calificacion-alimentos.html" }
   ]
 }
