@@ -969,6 +969,13 @@ body{background:var(--bg);font-family:'Morl',sans-serif;color:var(--text);displa
     Historial
   </a>
 
+  <a class="nav-item" onclick="showView('monitor')" id="nav-monitor">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+    </svg>
+    Monitoreo
+  </a>
+
   <div class="nav-section-label" style="margin-top:8px">Cuenta</div>
 
   <a class="nav-item" onclick="showView('ajustes')" id="nav-ajustes">
@@ -1712,6 +1719,91 @@ body{background:var(--bg);font-family:'Morl',sans-serif;color:var(--text);displa
     </div>
   </div>
 
+
+  <!-- ════ VIEW: MONITOREO ════ -->
+  <div class="view" id="view-monitor">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Monitoreo de Sesiones</div>
+        <div class="page-sub">Actividad en tiempo real · Errores · Acciones de operadores</div>
+      </div>
+      <button class="btn-filter" onclick="loadMonitor()" style="background:transparent;border:1px solid var(--border2);color:var(--text2);">↻ Actualizar</button>
+    </div>
+
+    <!-- KPIs de monitoreo -->
+    <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
+      <div class="kpi-card gold">
+        <span class="kpi-lbl">Eventos hoy</span>
+        <div class="kpi-val" id="m-total">—</div>
+      </div>
+      <div class="kpi-card red">
+        <span class="kpi-lbl">Errores</span>
+        <div class="kpi-val" id="m-errors" style="color:var(--red)">—</div>
+      </div>
+      <div class="kpi-card orange">
+        <span class="kpi-lbl">Warnings</span>
+        <div class="kpi-val" id="m-warns">—</div>
+      </div>
+      <div class="kpi-card green">
+        <span class="kpi-lbl">Sesiones activas</span>
+        <div class="kpi-val" id="m-sessions">—</div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-bar" style="margin-bottom:14px;">
+      <select class="f-select" id="m-filter-sev" onchange="loadMonitor()">
+        <option value="">Todo</option>
+        <option value="error">Solo errores</option>
+        <option value="warn">Solo warnings</option>
+        <option value="info">Solo info</option>
+      </select>
+      <select class="f-select" id="m-filter-type" onchange="loadMonitor()">
+        <option value="">Todos los tipos</option>
+        <option value="error">JS Error</option>
+        <option value="api_error">API Error</option>
+        <option value="network_error">Error de red</option>
+        <option value="session_start">Inicio sesión</option>
+        <option value="session_end">Fin sesión</option>
+        <option value="api_slow">API lenta</option>
+      </select>
+      <select class="f-select" id="m-filter-op" onchange="loadMonitor()">
+        <option value="">Todos los operadores</option>
+      </select>
+      <span style="font-size:11px;color:var(--text3);margin-left:auto;" id="m-last-update">—</span>
+    </div>
+
+    <!-- Tabla de eventos -->
+    <div class="table-wrap">
+      <table class="data-table" id="monitor-table">
+        <thead>
+          <tr>
+            <th>Hora</th>
+            <th>Severidad</th>
+            <th>Tipo</th>
+            <th>Operador</th>
+            <th>Vista</th>
+            <th>Detalle</th>
+            <th>IP</th>
+            <th>GPS</th>
+          </tr>
+        </thead>
+        <tbody id="monitor-tbody">
+          <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Auto-refresh -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+      <label style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text3);cursor:pointer;">
+        <input type="checkbox" id="m-autorefresh" onchange="toggleAutoRefresh(this.checked)" style="cursor:pointer;">
+        Auto-actualizar cada 15 segundos
+      </label>
+      <span style="font-size:10px;color:var(--text3);" id="m-count">—</span>
+    </div>
+  </div>
+
 </div><!-- /main-content -->
 
 <script>
@@ -1760,17 +1852,19 @@ function logout() {
 }
 
 /* ── NAVEGACIÓN ── */
-const VIEWS = ['dashboard','evaluacion','salon','historial','ajustes'];
+const VIEWS = ['dashboard','evaluacion','salon','historial','monitor','ajustes'];
 function showView(name) {
   VIEWS.forEach(v => {
     document.getElementById(`view-${v}`).classList.toggle('active', v===name);
     document.getElementById(`nav-${v}`).classList.toggle('active', v===name);
   });
   document.getElementById('view-title').textContent =
-    { dashboard:'Dashboard', evaluacion:'Nueva Evaluación', salon:'Evaluación de Salón', historial:'Historial', ajustes:'Ajustes' }[name] || '';
+    { dashboard:'Dashboard', evaluacion:'Nueva Evaluación', salon:'Evaluación de Salón', historial:'Historial', monitor:'Monitoreo de Sesiones', ajustes:'Ajustes' }[name] || '';
   if (name==='dashboard') loadDashboard();
   if (name==='historial') { currentPage=1; loadHistorial(); }
   if (name==='ajustes')   loadAjustes();
+  if (name==='monitor')   loadMonitor();
+  trackView(name);
   if (name==='salon')     initSalonTimer();
 }
 
@@ -2275,6 +2369,115 @@ function limpiar(){
   updateGlobal();
 }
 
+
+/* ══════════════════════════════════════════
+   MONITOREO DE SESIONES
+   ══════════════════════════════════════════ */
+let monitorRefreshInterval = null;
+
+async function loadMonitor() {
+  const sev  = document.getElementById('m-filter-sev')?.value  || '';
+  const type = document.getElementById('m-filter-type')?.value || '';
+  const op   = document.getElementById('m-filter-op')?.value   || '';
+  const tbody = document.getElementById('monitor-tbody');
+  if (!tbody) return;
+
+  try {
+    const headers = TOKEN ? { 'Authorization': `Bearer ${TOKEN}` } : {};
+    let url = `/api/monitor?tenant=${TENANT?.slug||'dmz'}&limit=100`;
+    if (sev)  url += `&severity=${sev}`;
+    if (type) url += `&event_type=${encodeURIComponent(type)}`;
+    if (op)   url += `&operator_id=${encodeURIComponent(op)}`;
+
+    const res  = await fetch(url, { headers });
+    const data = await res.json();
+
+    if (!res.ok) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--red)">Error: ${data.error||res.status}</td></tr>`; return; }
+
+    const events   = data.events   || [];
+    const stats    = data.stats    || {};
+    const operators = data.operators || [];
+
+    // KPIs
+    const el = (id) => document.getElementById(id);
+    if (el('m-total'))    el('m-total').textContent    = stats.total    || 0;
+    if (el('m-errors'))   el('m-errors').textContent   = stats.errors   || 0;
+    if (el('m-warns'))    el('m-warns').textContent    = stats.warnings || 0;
+    if (el('m-sessions')) el('m-sessions').textContent = stats.sessions || 0;
+    if (el('m-last-update')) el('m-last-update').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-MX');
+    if (el('m-count')) el('m-count').textContent = `${events.length} eventos`;
+
+    // Poblar filtro de operadores
+    const opSelect = document.getElementById('m-filter-op');
+    if (opSelect && operators.length) {
+      const current = opSelect.value;
+      const existingOpts = [...opSelect.options].map(o => o.value);
+      operators.forEach(op => {
+        if (!existingOpts.includes(op.operator_id)) {
+          const opt = document.createElement('option');
+          opt.value = op.operator_id;
+          opt.textContent = op.email || op.operator_id?.slice(0,8) || '—';
+          opSelect.appendChild(opt);
+        }
+      });
+      opSelect.value = current;
+    }
+
+    // Colores por severidad
+    const SEV_COLORS = {
+      critical: { bg:'#FAEAEA', color:'#B83232', label:'CRÍTICO'  },
+      error:    { bg:'#FAEAEA', color:'#B83232', label:'ERROR'    },
+      warn:     { bg:'#FDF0E8', color:'#C06020', label:'AVISO'    },
+      info:     { bg:'#E6F4EC', color:'#1A5E3A', label:'INFO'     },
+    };
+
+    if (!events.length) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text3)">Sin eventos registrados con los filtros seleccionados.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = events.map(e => {
+      const sc  = SEV_COLORS[e.severity] || SEV_COLORS.info;
+      const ts  = e.occurred_at ? new Date(e.occurred_at).toLocaleTimeString('es-MX') : '—';
+      const dt  = e.occurred_at ? new Date(e.occurred_at).toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit'}) : '';
+      const err = (e.error_message||'').slice(0,80);
+      const act = (e.action||'').slice(0,40);
+      const detail = err || act || (e.payload ? JSON.stringify(e.payload).slice(0,60) : '—');
+      const gps = e.gps_lat ? `${parseFloat(e.gps_lat).toFixed(4)},${parseFloat(e.gps_lng).toFixed(4)}` : '—';
+      const gpsColor = e.gps_lat ? 'color:var(--green2)' : 'color:var(--text3)';
+      const dur = e.duration_ms ? ` <span style="color:var(--text3);font-size:10px">${e.duration_ms}ms</span>` : '';
+
+      return `<tr style="${e.severity==='error'||e.severity==='critical'?'background:#FAEAEA':e.severity==='warn'?'background:#FDF0E8':''}">
+        <td style="font-family:monospace;font-size:10px;white-space:nowrap">${dt}<br>${ts}</td>
+        <td><span style="background:${sc.bg};color:${sc.color};font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 7px;text-transform:uppercase">${sc.label}</span></td>
+        <td style="font-size:11px;color:var(--text2);font-family:monospace">${e.event_type||'—'}${dur}</td>
+        <td style="font-size:11px;color:var(--text2)">${e.operator_email||e.operator_id?.slice(0,8)||'—'}</td>
+        <td style="font-size:11px;color:var(--text3)">${e.view_name||'—'}</td>
+        <td style="font-size:11px;color:${e.error_message?'var(--red)':'var(--text2)'}; max-width:300px;word-break:break-word">${detail}</td>
+        <td style="font-family:monospace;font-size:10px;color:var(--text3)">${(e.client_ip||'—').slice(0,15)}</td>
+        <td style="font-family:monospace;font-size:9px;${gpsColor}">${gps}</td>
+      </tr>`;
+    }).join('');
+
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--red)">Error de red: ${err.message}</td></tr>`;
+    if (window.DMZ_TRACK) DMZ_TRACK('error', { error: err.message, action: 'loadMonitor' });
+  }
+}
+
+function toggleAutoRefresh(enabled) {
+  if (monitorRefreshInterval) { clearInterval(monitorRefreshInterval); monitorRefreshInterval = null; }
+  if (enabled) { monitorRefreshInterval = setInterval(loadMonitor, 15000); }
+}
+
+/* También trackear acciones del dashboard */
+function trackView(name) {
+  if (window.DMZ_TRACK) {
+    window.DMZ_CURRENT_VIEW = name;
+    DMZ_TRACK('view_change', { action: `navigate_to_${name}` });
+  }
+}
+
 /* ── INIT ── */
 document.getElementById('m-fecha').value = new Date().toISOString().split('T')[0];
 addCard(); addCard(); addCard();
@@ -2619,6 +2822,164 @@ function limpiarSalon() {
   });
   document.getElementById('snivel-needle').style.left = '50%';
 }
+</script>
+
+<script>
+/* ══════════════════════════════════════════════
+   DMZ AUDIT — TELEMETRY SDK v1.0
+   Monitoreo de sesión en tiempo real
+   Fire-and-forget: nunca bloquea la UI
+   ══════════════════════════════════════════════ */
+(function initTelemetry() {
+  const BATCH_MS   = 3000;   // enviar batch cada 3 segundos
+  const MAX_QUEUE  = 50;     // máximo de eventos en cola
+  const ENDPOINT   = '/api/telemetry';
+
+  let queue        = [];
+  let batchTimer   = null;
+  let sessionStart = Date.now();
+
+  // Leer token y operator del sessionStorage
+  function getMeta() {
+    try {
+      const op  = JSON.parse(sessionStorage.getItem('racreaa_op')  || 'null');
+      const ten = JSON.parse(sessionStorage.getItem('racreaa_tenant') || 'null');
+      const tok = sessionStorage.getItem('racreaa_at');
+      return { token: tok, operatorId: op?.id, tenantId: ten?.id, role: op?.role, email: op?.email };
+    } catch { return {}; }
+  }
+
+  // GPS actual (inyectado desde window.DMZ_GPS si está disponible)
+  function getGPS() {
+    return window.DMZ_GPS || null;
+  }
+
+  // Crear un evento
+  function createEvent(type, data = {}) {
+    const meta = getMeta();
+    return {
+      event_type:    type,
+      view_name:     window.DMZ_CURRENT_VIEW || document.title,
+      action:        data.action    || null,
+      payload:       data.payload   || null,
+      error_message: data.error     || null,
+      duration_ms:   data.duration  || null,
+      severity:      data.severity  || (type === 'error' ? 'error' : 'info'),
+      session_token: meta.token,
+      operator_id:   meta.operatorId,
+      tenant_id:     meta.tenantId,
+      gps:           getGPS(),
+      occurred_at:   new Date().toISOString(),
+    };
+  }
+
+  // Agregar a la cola
+  function track(type, data = {}) {
+    if (queue.length >= MAX_QUEUE) queue.shift(); // FIFO — descartar más antiguo
+    queue.push(createEvent(type, data));
+    scheduleBatch();
+  }
+
+  // Enviar batch
+  function scheduleBatch() {
+    if (batchTimer) return;
+    batchTimer = setTimeout(flush, BATCH_MS);
+  }
+
+  function flush() {
+    batchTimer = null;
+    if (!queue.length) return;
+    const batch = queue.splice(0, 20);
+    const meta  = getMeta();
+
+    navigator.sendBeacon
+      ? navigator.sendBeacon(ENDPOINT, new Blob([JSON.stringify(batch)], { type: 'application/json' }))
+      : fetch(ENDPOINT, {
+          method: 'POST', keepalive: true,
+          headers: { 'Content-Type': 'application/json', 'Authorization': meta.token ? `Bearer ${meta.token}` : '' },
+          body: JSON.stringify(batch)
+        }).catch(() => {});
+  }
+
+  // Flush al cerrar/salir
+  window.addEventListener('beforeunload', () => {
+    track('session_end', { action: 'page_unload', payload: { duration_ms: Date.now() - sessionStart } });
+    flush();
+  });
+
+  // ── CAPTURAR ERRORES JS GLOBALES ──
+  window.addEventListener('error', (e) => {
+    track('error', {
+      error:    `${e.message} (${e.filename}:${e.lineno}:${e.colno})`,
+      severity: 'error',
+      payload:  { stack: e.error?.stack?.slice(0, 500) || null }
+    });
+  });
+
+  window.addEventListener('unhandledrejection', (e) => {
+    track('error', {
+      error:    `Unhandled Promise: ${e.reason?.message || String(e.reason)}`.slice(0, 300),
+      severity: 'error',
+      payload:  { reason: String(e.reason).slice(0, 300) }
+    });
+  });
+
+  // ── CAPTURAR ERRORES DE RED ──
+  const origFetch = window.fetch;
+  window.fetch = async function(...args) {
+    const t0  = Date.now();
+    const url = typeof args[0] === 'string' ? args[0] : args[0]?.url || '';
+    try {
+      const res = await origFetch.apply(this, args);
+      const dur = Date.now() - t0;
+      // Solo loguear errores de API propios
+      if (url.includes('/api/') && !res.ok) {
+        track('api_error', {
+          error:    `${res.status} ${res.statusText} — ${url}`,
+          severity: res.status >= 500 ? 'error' : 'warn',
+          duration: dur,
+          payload:  { url, status: res.status, method: args[1]?.method || 'GET' }
+        });
+      }
+      // Loguear latencia alta (>3s)
+      if (url.includes('/api/') && dur > 3000) {
+        track('api_slow', {
+          severity: 'warn',
+          duration: dur,
+          payload:  { url, duration_ms: dur }
+        });
+      }
+      return res;
+    } catch (err) {
+      track('network_error', {
+        error:    `${err.message} — ${url}`,
+        severity: 'error',
+        payload:  { url, error: err.message }
+      });
+      throw err;
+    }
+  };
+
+  // ── EXPONER API PÚBLICA ──
+  window.DMZ_TRACK = track;
+  window.DMZ_FLUSH = flush;
+
+  // Evento de sesión iniciada
+  track('session_start', {
+    action: 'page_load',
+    payload: { url: location.pathname, referrer: document.referrer }
+  });
+
+  // Ping cada 2 minutos para detectar sesiones activas
+  setInterval(() => {
+    track('session_ping', {
+      action: 'heartbeat',
+      payload: { duration_ms: Date.now() - sessionStart, url: location.pathname }
+    });
+  }, 120000);
+
+})();
+
 </script>
 </body>
 </html>
