@@ -12,9 +12,6 @@
     },
     "api/tenant/*.js": {
       "maxDuration": 30
-    },
-    "api/monitor.js": {
-      "maxDuration": 30
     }
   },
   "headers": [
