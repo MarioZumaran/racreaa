@@ -21,3 +21,6 @@ npm-debug.log*
 # Build
 dist/
 .next/
+.vercel
+node_modules/
+netlify/functions/node_modules/

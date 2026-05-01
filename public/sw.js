@@ -1,5 +1,5 @@
-const CACHE = 'dmz-audit-v1';
-const STATIC = ['/app.html', '/login.html', '/logo-dmz.jpg', '/manifest.json'];
+const CACHE = 'dmz-audit-v2';
+const STATIC = ['/login.html', '/app.html', '/logo-dmz.jpg', '/manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC)).then(() => self.skipWaiting()));
@@ -14,7 +14,7 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  if (e.request.url.includes('/api/')) return; // API siempre en red
+  if (e.request.url.includes('/api/') || e.request.url.includes('/.netlify/')) return;
   e.respondWith(
     caches.match(e.request).then(cached => {
       const network = fetch(e.request).then(res => {

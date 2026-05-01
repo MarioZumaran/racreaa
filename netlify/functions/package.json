@@ -1,0 +1,10 @@
+{
+  "name": "dmz-audit-functions",
+  "version": "1.0.0",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0",
+    "pg": "^8.11.0",
+    "resend": "^3.0.0"
+  }
+}

@@ -1535,7 +1535,7 @@ function tickTimerM(){
 /* ── LOGOUT ── */
 function logout(){
   if(!confirm('¿Cerrar sesión?'))return;
-  fetch('/api/auth/logout',{method:'POST',credentials:'include',headers:{'Authorization':`Bearer ${TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({all_devices:false})})
+  fetch('/api/auth-logout',{method:'POST',credentials:'include',headers:{'Authorization':`Bearer ${TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({all_devices:false})})
     .finally(()=>{sessionStorage.clear();window.location.href='/login.html';});
 }
 
