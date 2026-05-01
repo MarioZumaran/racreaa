@@ -1,0 +1,15 @@
+/                     /login.html           200
+/login                /login.html           200
+/dashboard            /dashboard.html       200
+/app                  /app.html             200
+/set-password         /set-password.html    200
+/api/auth-login       /.netlify/functions/auth-login       200
+/api/auth-refresh     /.netlify/functions/auth-refresh     200
+/api/auth-logout      /.netlify/functions/auth-logout      200
+/api/auth-set-password /.netlify/functions/auth-set-password 200
+/api/submit-audit     /.netlify/functions/submit-audit     200
+/api/audits           /.netlify/functions/audits           200
+/api/telemetry        /.netlify/functions/telemetry        200
+/api/monitor          /.netlify/functions/monitor          200
+/api/health           /.netlify/functions/health           200
+/api/tenant-branding  /.netlify/functions/tenant-branding  200
