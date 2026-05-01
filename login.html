@@ -453,7 +453,7 @@ document.addEventListener('contextmenu', e => e.preventDefault());
   document.getElementById('f-tenant').value = slug;
 
   // Precargar branding del tenant
-  fetch(`https://dmz-audit.netlify.app/api/tenant/${encodeURIComponent(slug)}/branding`)
+  fetch(`https://dmz-audit.netlify.app/api/tenant-branding?slug=${encodeURIComponent(slug)}`)
     .then(r => r.ok ? r.json() : null)
     .then(data => {
       if (!data) return;
