@@ -11,7 +11,12 @@ const pool   = new Pool({ connectionString: process.env.DATABASE_URL, ssl:{ reje
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const JWT_SECRET      = process.env.JWT_SECRET;
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS||'').split(',').map(s=>s.trim());
+const ALLOWED_ORIGINS = [
+  ...(process.env.ALLOWED_ORIGINS||'').split(',').map(s=>s.trim()),
+  'https://mariozumaran.github.io',
+  'https://dmz-audit.netlify.app',
+  'https://racreaa.vercel.app',
+].filter(Boolean);
 const REPORT_EMAIL    = process.env.AUDIT_REPORT_EMAIL || 'mario@delamorazumaran.com';
 
 function sha256(d) { return crypto.createHash('sha256').update(JSON.stringify(d)).digest('hex'); }

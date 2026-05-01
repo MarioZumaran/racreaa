@@ -5,7 +5,12 @@ const crypto   = require('crypto');
 const pool = new Pool({ connectionString:process.env.DATABASE_URL, ssl:{rejectUnauthorized:true}, max:5 });
 const JWT_SECRET      = process.env.JWT_SECRET;
 const JWT_EXPIRY      = process.env.JWT_EXPIRY||'15m';
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS||'').split(',').map(s=>s.trim());
+const ALLOWED_ORIGINS = [
+  ...(process.env.ALLOWED_ORIGINS||'').split(',').map(s=>s.trim()),
+  'https://mariozumaran.github.io',
+  'https://dmz-audit.netlify.app',
+  'https://racreaa.vercel.app',
+].filter(Boolean);
 
 function parseCookies(h) {
   if(!h) return {};

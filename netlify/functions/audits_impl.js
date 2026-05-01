@@ -3,7 +3,12 @@ const jwt      = require('jsonwebtoken');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl:{ rejectUnauthorized:true }, max:5 });
 const JWT_SECRET      = process.env.JWT_SECRET;
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS||'').split(',').map(s=>s.trim());
+const ALLOWED_ORIGINS = [
+  ...(process.env.ALLOWED_ORIGINS||'').split(',').map(s=>s.trim()),
+  'https://mariozumaran.github.io',
+  'https://dmz-audit.netlify.app',
+  'https://racreaa.vercel.app',
+].filter(Boolean);
 
 function verifyToken(h) {
   if (!h?.startsWith('Bearer ')) return null;
