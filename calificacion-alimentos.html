@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#2C2A24">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- Security Headers (reforzados por vercel.json en producción) -->
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="Referrer-Policy" content="no-referrer">
+<meta http-equiv="Permissions-Policy" content="camera=(self), geolocation=(self), microphone=(), clipboard-read=(), clipboard-write=()">
+
+<title>RACREAA · Calificación de Alimentos</title>
+<link rel="manifest" href="/manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@600;700;900&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════
+   FLAG_SECURE CSS — BLOQUEO DE EXTRACCIÓN CLIENT-SIDE
+   ═══════════════════════════════════════════════════ */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Permitir selección solo en inputs/textareas */
+input, textarea, [contenteditable] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Bloqueo de impresión */
+@media print {
+  body::before {
+    content: "DOCUMENTO CONFIDENCIAL — IMPRESIÓN NO AUTORIZADA";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: white;
+    z-index: 99999;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 40vh;
+    color: #B83232;
+  }
+  body > *:not(noscript) { visibility: hidden !important; }
+}
+
+/* ═══════════════════════════════
+   DESIGN TOKENS
+   ═══════════════════════════════ */
+:root {
+  --bg:          #FAFAF7;
+  --surface:     #FFFFFF;
+  --surface2:    #F3F1EB;
+  --border:      #E0DDD4;
+  --border2:     #CCC8BC;
+  --text:        #2C2A24;
+  --text2:       #5C5A54;
+  --text3:       #9A9890;
+  --gold:        #B8922A;
+  --gold-lt:     #F5ECD9;
+  --gold-dim:    #8A6C1E;
+  --header-bg:   #2C2A24;
+  --red:         #B83232;
+  --red-lt:      #FAEAEA;
+  --orange:      #C06020;
+  --orange-lt:   #FDF0E8;
+  --yellow:      #A07820;
+  --yellow-lt:   #FBF5E0;
+  --green:       #2E7D52;
+  --green-lt:    #E6F4EC;
+  --green2:      #1A5E3A;
+  --green2-lt:   #D6EDE0;
+
+  /* Tenant override vars — se inyectan por JS al cargar sesión */
+  --tenant-primary:   var(--gold);
+  --tenant-secondary: var(--header-bg);
+  --tenant-logo-url:  none;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { background:var(--bg); font-family:'Barlow',sans-serif; color:var(--text); min-height:100vh; font-size:14px; }
+
+/* ═══════════════════════════════
+   HEADER MULTI-TENANT
+   ═══════════════════════════════ */
+.header {
+  background: var(--tenant-secondary);
+  padding: 0 40px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  border-bottom: 2px solid var(--tenant-primary);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 28px 12px 0;
+  border-right: 1px solid rgba(255,255,255,.1);
+}
+
+/* Logotipo del tenant — se inyecta dinámicamente */
+.tenant-logo-wrap {
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.tenant-logo-img {
+  max-height: 36px;
+  max-width: 120px;
+  object-fit: contain;
+  display: none; /* oculto hasta que cargue */
+}
+
+.brand-dmz {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: 6px;
+  color: var(--tenant-primary);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.brand-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255,255,255,.15);
+  display: none; /* visible solo cuando hay tenant logo */
+}
+
+.brand-sub {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,.4);
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 0 12px 28px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.meta-field { display:flex; flex-direction:column; gap:3px; }
+.meta-label { font-size:8px; letter-spacing:2px; color:rgba(255,255,255,.3); text-transform:uppercase; }
+.meta-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  color: #E8E5DC;
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 0;
+  width: 130px;
+  outline: none;
+  transition: border-color .2s;
+}
+.meta-input:focus { border-bottom-color: var(--tenant-primary); }
+.meta-input::placeholder { color:rgba(255,255,255,.15); }
+
+.score-badge {
+  margin-left: auto;
+  background: var(--tenant-primary);
+  padding: 8px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 72px;
+}
+.score-badge .sn { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:24px; color:var(--header-bg); line-height:1; }
+.score-badge .sl { font-size:7px; font-weight:700; letter-spacing:2px; color:rgba(0,0,0,.4); text-transform:uppercase; }
+
+/* Indicador de sesión segura */
+.session-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  border-left: 1px solid rgba(255,255,255,.1);
+}
+.session-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity:1; } 50% { opacity:.3; }
+}
+.session-label { font-size:9px; letter-spacing:2px; color:rgba(255,255,255,.3); text-transform:uppercase; }
+.session-id { font-size:9px; color:rgba(255,255,255,.5); font-family:monospace; }
+
+/* ═══════════════════════════════
+   GPS STATUS BAR
+   ═══════════════════════════════ */
+.gps-bar {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 40px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 10px;
+}
+.gps-status { display:flex; align-items:center; gap:5px; }
+.gps-dot { width:6px; height:6px; border-radius:50%; background:var(--text3); transition:background .3s; }
+.gps-dot.active { background:var(--green); }
+.gps-dot.error  { background:var(--red); }
+.gps-text { color:var(--text3); letter-spacing:1px; text-transform:uppercase; }
+.gps-coords { color:var(--text2); font-family:monospace; font-size:10px; }
+.gps-accuracy { color:var(--text3); font-size:9px; }
+
+/* ═══════════════════════════════
+   LAYOUT PRINCIPAL
+   ═══════════════════════════════ */
+.main { max-width:1120px; margin:0 auto; padding:28px 32px 80px; display:grid; grid-template-columns:1fr 320px; gap:20px; align-items:start; }
+
+.section-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.section-label { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:10px; letter-spacing:3px; color:var(--gold); text-transform:uppercase; }
+.btn-add { background:var(--surface); border:1px solid var(--gold); color:var(--gold); font-family:'Barlow',sans-serif; font-size:11px; font-weight:600; letter-spacing:1px; padding:6px 16px; cursor:pointer; text-transform:uppercase; transition:all .2s; }
+.btn-add:hover { background:var(--gold); color:var(--surface); }
+
+/* ═══════════════════════════════
+   TARJETAS DE PLATILLO
+   ═══════════════════════════════ */
+.cards-col { display:flex; flex-direction:column; gap:12px; }
+
+.platillo-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border2);
+  padding: 16px 18px;
+  position: relative;
+  transition: border-left-color .3s, box-shadow .2s;
+}
+.platillo-card:hover { box-shadow:0 2px 12px rgba(0,0,0,.07); }
+.platillo-card[data-nivel="excelente"] { border-left-color:var(--green2); }
+.platillo-card[data-nivel="bueno"]     { border-left-color:var(--green); }
+.platillo-card[data-nivel="regular"]   { border-left-color:var(--yellow); }
+.platillo-card[data-nivel="deficiente"]{ border-left-color:var(--orange); }
+.platillo-card[data-nivel="critico"]   { border-left-color:var(--red); }
+
+.card-top { display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+.card-num { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:30px; color:var(--border2); line-height:1; min-width:34px; margin-top:4px; }
+.card-fields { flex:1; display:flex; flex-direction:column; gap:8px; }
+.field-row { display:flex; gap:8px; }
+.f-name { background:var(--bg); border:1px solid var(--border); color:var(--text); font-family:'Barlow',sans-serif; font-size:13px; font-weight:600; padding:7px 10px; flex:1; outline:none; transition:border-color .2s; }
+.f-name:focus { border-color:var(--gold); }
+.f-name::placeholder { color:var(--text3); font-weight:400; }
+.f-cat { background:var(--bg); border:1px solid var(--border); color:var(--text2); font-family:'Barlow',sans-serif; font-size:12px; padding:7px 28px 7px 10px; outline:none; width:150px; cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239A9890'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; background-color:var(--bg); transition:border-color .2s; }
+.f-cat:focus { border-color:var(--gold); }
+
+.criterios { display:flex; flex-direction:column; gap:7px; }
+.criterio-row { display:flex; align-items:center; gap:10px; }
+.crit-label { font-size:11px; color:var(--text3); width:108px; flex-shrink:0; }
+.stars { display:flex; gap:3px; }
+.star { font-size:16px; cursor:pointer; color:var(--border2); transition:transform .12s,color .12s; user-select:none; line-height:1; -webkit-user-select:none; }
+.star:hover { transform:scale(1.25); }
+.star.on { color:var(--gold); }
+.score-bar-wrap { flex:1; height:3px; background:var(--surface2); border-radius:2px; overflow:hidden; }
+.score-bar-fill { height:100%; background:var(--gold); border-radius:2px; transition:width .3s; }
+.crit-score { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13px; color:var(--text3); min-width:14px; text-align:right; }
+
+/* ═══════════════════════════════
+   EVIDENCIA FOTOGRÁFICA ZERO-TRUST
+   ═══════════════════════════════ */
+.evidence-zone {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-capture {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px dashed var(--border2);
+  color: var(--text2);
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 7px 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all .2s;
+}
+.btn-capture:hover { border-color:var(--gold); color:var(--gold); background:var(--gold-lt); }
+.btn-capture svg { width:14px; height:14px; }
+
+/* Input de cámara oculto — se activa por JS con capture="environment" */
+.camera-input { display:none; }
+
+.evidence-thumb {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.evidence-thumb img { width:100%; height:100%; object-fit:cover; }
+.evidence-thumb .gps-stamp {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(0,0,0,.72);
+  color: #fff;
+  font-size: 6px;
+  font-family: monospace;
+  padding: 2px 4px;
+  line-height: 1.4;
+  pointer-events: none;
+}
+.evidence-thumb .del-thumb {
+  position: absolute;
+  top: 2px; right: 2px;
+  background: rgba(184,50,50,.85);
+  border: none;
+  color: #fff;
+  width: 16px; height: 16px;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.evidence-thumb:hover .del-thumb { opacity:1; }
+
+/* Badge de verificación GPS */
+.gps-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--green-lt);
+  border: 1px solid var(--green);
+  color: var(--green2);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+.gps-error-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--red-lt);
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════
+   CARD FOOTER
+   ═══════════════════════════════ */
+.card-footer { display:flex; align-items:center; gap:12px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+.card-obs { background:var(--bg); border:1px solid var(--border); color:var(--text); font-family:'Barlow',sans-serif; font-size:12px; padding:7px 10px; flex:1; outline:none; resize:none; height:46px; line-height:1.5; transition:border-color .2s; -webkit-user-select:text; user-select:text; }
+.card-obs:focus { border-color:var(--gold); }
+.card-obs::placeholder { color:var(--text3); }
+.card-total { display:flex; flex-direction:column; align-items:center; gap:4px; flex-shrink:0; }
+.total-ring { width:52px; height:52px; border-radius:50%; border:2px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; transition:border-color .3s; }
+.total-n { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:19px; line-height:1; color:var(--text); }
+.total-sub { font-size:8px; color:var(--text3); letter-spacing:1px; }
+.nivel-tag { font-size:8px; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:2px 7px; background:var(--surface2); color:var(--text3); transition:background .3s,color .3s; }
+.btn-del { position:absolute; top:10px; right:10px; background:transparent; border:none; color:var(--border2); font-size:18px; line-height:1; cursor:pointer; padding:2px 6px; transition:color .2s; }
+.btn-del:hover { color:var(--red); }
+
+/* ═══════════════════════════════
+   PANEL DERECHO
+   ═══════════════════════════════ */
+.col-panel { display:flex; flex-direction:column; gap:14px; }
+.panel-block { background:var(--surface); border:1px solid var(--border); padding:18px; }
+.panel-title { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:9px; letter-spacing:3px; color:var(--gold-dim); text-transform:uppercase; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+
+.res-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+.res-cell { background:var(--bg); border:1px solid var(--border); padding:10px 12px; }
+.res-lbl { font-size:8px; letter-spacing:2px; color:var(--text3); text-transform:uppercase; display:block; margin-bottom:3px; }
+.res-val { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:24px; color:var(--text); line-height:1; }
+
+.semaforo { display:flex; gap:5px; justify-content:center; margin:4px 0 10px; }
+.sem-dot { width:11px; height:11px; border-radius:50%; opacity:.2; transition:opacity .3s; border:1px solid rgba(0,0,0,.08); }
+.sem-dot.active { opacity:1; }
+.nivel-bar { height:4px; background:linear-gradient(to right,var(--red),var(--orange),var(--yellow),var(--green),var(--green2)); border-radius:2px; position:relative; margin-top:4px; }
+.nivel-needle { width:2px; height:10px; background:var(--text); position:absolute; top:-3px; transform:translateX(-50%); border-radius:1px; transition:left .4s; }
+
+.dist-list { display:flex; flex-direction:column; gap:7px; }
+.dist-row { display:flex; align-items:center; gap:8px; }
+.dist-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.dist-name { font-size:12px; color:var(--text2); flex:1; }
+.dist-count { font-size:12px; font-weight:600; color:var(--text); min-width:18px; text-align:right; }
+.dist-pct { font-size:11px; color:var(--text3); min-width:32px; text-align:right; }
+.dist-bw { flex:1; height:2px; background:var(--surface2); }
+.dist-bf { height:100%; transition:width .4s; }
+
+.cs-list { display:flex; flex-direction:column; gap:8px; }
+.cs-row { display:flex; align-items:center; gap:8px; }
+.cs-name { font-size:11px; color:var(--text2); flex:1; }
+.cs-val { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13px; color:var(--gold-dim); min-width:28px; text-align:right; }
+.cs-bw { width:70px; height:2px; background:var(--surface2); }
+.cs-bf { height:100%; background:var(--gold); transition:width .4s; }
+
+/* ═══════════════════════════════
+   FIRMA DIGITAL + ENVÍO
+   ═══════════════════════════════ */
+.concl { background:var(--bg); border:1px solid var(--border); color:var(--text); font-family:'Barlow',sans-serif; font-size:12px; line-height:1.6; padding:10px 12px; width:100%; outline:none; resize:none; height:96px; transition:border-color .2s; -webkit-user-select:text; user-select:text; }
+.concl:focus { border-color:var(--gold); }
+.concl::placeholder { color:var(--text3); }
+
+.firmas { display:flex; gap:12px; margin-top:14px; }
+.firma { flex:1; border-top:1px solid var(--text3); padding-top:6px; }
+.firma-lbl { font-size:8px; letter-spacing:2px; color:var(--text3); text-transform:uppercase; }
+.firma-inp { background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text); font-family:'Barlow',sans-serif; font-size:11px; padding:3px 0; width:100%; outline:none; margin-top:4px; -webkit-user-select:text; user-select:text; }
+.firma-inp:focus { border-bottom-color:var(--gold); }
+.firma-inp::placeholder { color:var(--text3); }
+
+/* Canvas de firma digital */
+.signature-canvas-wrap {
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  position: relative;
+}
+.signature-canvas {
+  display: block;
+  width: 100%;
+  height: 80px;
+  cursor: crosshair;
+  touch-action: none;
+}
+.sig-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 4px 8px;
+  border-top: 1px solid var(--border);
+}
+.sig-btn { background:transparent; border:none; color:var(--text3); font-size:9px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; padding:2px 6px; font-family:'Barlow',sans-serif; font-weight:600; }
+.sig-btn:hover { color:var(--gold); }
+
+.submit-status {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  font-size: 11px;
+  color: var(--text2);
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+.submit-status.visible { display:flex; }
+.submit-status.success { background:var(--green-lt); border-color:var(--green); color:var(--green2); }
+.submit-status.error   { background:var(--red-lt);   border-color:var(--red);   color:var(--red); }
+.submit-status.loading { background:var(--gold-lt);  border-color:var(--gold);  color:var(--gold-dim); }
+
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.btn-act { display:block; width:100%; padding:10px; font-family:'Barlow',sans-serif; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; margin-top:8px; transition:all .2s; }
+.btn-act.outline { background:transparent; border:1px solid var(--border2); color:var(--text2); }
+.btn-act.outline:hover { border-color:var(--gold); color:var(--gold); }
+.btn-act.solid { background:var(--gold); border:1px solid var(--gold); color:var(--surface); }
+.btn-act.solid:hover { background:var(--gold-dim); border-color:var(--gold-dim); }
+.btn-act:disabled { opacity:.4; cursor:not-allowed; }
+
+/* Tenant logo upload (modo admin) */
+.tenant-logo-uploader {
+  display: none; /* visible solo en modo admin */
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--gold-lt);
+  border: 1px dashed var(--gold);
+  margin-bottom: 12px;
+}
+.tenant-logo-uploader.visible { display:flex; }
+.tlu-label { font-size:9px; letter-spacing:2px; color:var(--gold-dim); text-transform:uppercase; }
+.tlu-preview { max-height:40px; max-width:120px; object-fit:contain; display:none; }
+.tlu-preview.visible { display:block; }
+
+@media (max-width:900px) { .main { grid-template-columns:1fr; } .col-panel { order:-1; } .header { flex-wrap:wrap; } .header-meta { flex-wrap:wrap; gap:12px; } }
+</style>
+</head>
+<body>
+
+<!-- BARRA GPS -->
+<div class="gps-bar">
+  <div class="gps-status">
+    <div class="gps-dot" id="gps-dot"></div>
+    <span class="gps-text" id="gps-text">Inicializando GPS...</span>
+  </div>
+  <span class="gps-coords" id="gps-coords">—</span>
+  <span class="gps-accuracy" id="gps-accuracy"></span>
+</div>
+
+<!-- HEADER MULTI-TENANT -->
+<header class="header">
+  <div class="header-brand">
+    <div class="tenant-logo-wrap">
+      <!-- Logo del tenant se inyecta aquí por JS -->
+      <img class="tenant-logo-img" id="tenant-logo-img" src="" alt="Logo">
+      <div class="brand-divider" id="brand-divider"></div>
+    </div>
+    <div>
+      <div class="brand-dmz" id="brand-dmz">DMZ</div>
+      <div class="brand-sub">Kitchen Support · Calificación de Alimentos</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="meta-field">
+      <span class="meta-label">Establecimiento</span>
+      <input class="meta-input" id="m-est" placeholder="Nombre del restaurante">
+    </div>
+    <div class="meta-field">
+      <span class="meta-label">Auditor</span>
+      <input class="meta-input" id="m-aud" placeholder="Nombre">
+    </div>
+    <div class="meta-field">
+      <span class="meta-label">Fecha</span>
+      <input class="meta-input" id="m-fecha" type="date">
+    </div>
+    <div class="meta-field">
+      <span class="meta-label">Servicio</span>
+      <input class="meta-input" id="m-srv" placeholder="Desayuno / Comida / Cena">
+    </div>
+    <div class="score-badge">
+      <span class="sn" id="global-num">—</span>
+      <span class="sl">Global</span>
+    </div>
+    <div class="session-indicator">
+      <div class="session-dot"></div>
+      <div>
+        <div class="session-label">Sesión activa</div>
+        <div class="session-id" id="session-id">—</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+  <div>
+    <div class="section-head">
+      <span class="section-label">Platillos Evaluados</span>
+      <button class="btn-add" onclick="addCard()">+ Agregar platillo</button>
+    </div>
+    <div class="cards-col" id="cards-col"></div>
+  </div>
+
+  <div class="col-panel">
+
+    <!-- Resumen -->
+    <div class="panel-block">
+      <div class="panel-title">Resumen de Evaluación</div>
+      <div class="res-grid">
+        <div class="res-cell"><span class="res-lbl">Platillos</span><span class="res-val" id="r-total">0</span></div>
+        <div class="res-cell"><span class="res-lbl">Promedio</span><span class="res-val" id="r-prom">—</span></div>
+        <div class="res-cell"><span class="res-lbl">Calificación</span><span class="res-val" id="r-letra" style="font-size:30px">—</span></div>
+        <div class="res-cell"><span class="res-lbl">Nivel</span><span class="res-val" id="r-nivel" style="font-size:13px;letter-spacing:1px">—</span></div>
+      </div>
+      <div class="semaforo">
+        <div class="sem-dot" style="background:var(--red)"    id="sem-critico"></div>
+        <div class="sem-dot" style="background:var(--orange)" id="sem-deficiente"></div>
+        <div class="sem-dot" style="background:var(--yellow)" id="sem-regular"></div>
+        <div class="sem-dot" style="background:var(--green)"  id="sem-bueno"></div>
+        <div class="sem-dot" style="background:var(--green2)" id="sem-excelente"></div>
+      </div>
+      <div class="nivel-bar"><div class="nivel-needle" id="nivel-needle" style="left:50%"></div></div>
+    </div>
+
+    <!-- Distribución -->
+    <div class="panel-block">
+      <div class="panel-title">Distribución por Nivel</div>
+      <div class="dist-list" id="dist-list"></div>
+    </div>
+
+    <!-- Criterios -->
+    <div class="panel-block">
+      <div class="panel-title">Promedio por Criterio</div>
+      <div class="cs-list" id="cs-list"></div>
+    </div>
+
+    <!-- Conclusión, firma y envío -->
+    <div class="panel-block">
+      <div class="panel-title">Conclusión, Firma y Envío Seguro</div>
+
+      <textarea class="concl" id="conclusion" placeholder="Dictamen final, observaciones generales y recomendaciones clave..."></textarea>
+
+      <div class="firmas">
+        <div class="firma">
+          <div class="firma-lbl">Auditor DMZ</div>
+          <input class="firma-inp" id="fa" placeholder="Nombre completo">
+        </div>
+        <div class="firma">
+          <div class="firma-lbl">Chef / Responsable</div>
+          <input class="firma-inp" id="fc" placeholder="Nombre completo">
+        </div>
+      </div>
+
+      <!-- Canvas de firma digital -->
+      <div class="signature-canvas-wrap">
+        <canvas class="signature-canvas" id="sig-canvas" width="284" height="80"></canvas>
+        <div class="sig-actions">
+          <button class="sig-btn" onclick="clearSignature()">Limpiar firma</button>
+        </div>
+      </div>
+
+      <div class="submit-status" id="submit-status">
+        <div class="spinner"></div>
+        <span id="submit-msg">Procesando...</span>
+      </div>
+
+      <button class="btn-act solid" id="btn-submit" onclick="submitAudit()">Enviar Evaluación</button>
+      <button class="btn-act outline" onclick="limpiar()">Nueva Evaluación</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     JAVASCRIPT — LÓGICA COMPLETA
+     ═══════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ──────────────────────────────────
+   FLAG_SECURE JS — ANTI-EXTRACCIÓN
+   ────────────────────────────────── */
+(function initSecurity() {
+  // Bloquear clic derecho
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  // Bloquear teclas de desarrollador y de copia
+  document.addEventListener('keydown', e => {
+    const blocked = (
+      e.key === 'F12' ||
+      (e.ctrlKey && ['u','s','p','a','c'].includes(e.key.toLowerCase())) ||
+      (e.metaKey && ['u','s','p','a','c'].includes(e.key.toLowerCase())) ||
+      (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()))
+    );
+    if (blocked) { e.preventDefault(); e.stopPropagation(); return false; }
+  });
+
+  // Bloquear arrastrar imágenes/texto
+  document.addEventListener('dragstart', e => e.preventDefault());
+
+  // Detectar DevTools (heurística por tiempo)
+  let devOpen = false;
+  const threshold = 160;
+  setInterval(() => {
+    const w = window.outerWidth  - window.innerWidth  > threshold;
+    const h = window.outerHeight - window.innerHeight > threshold;
+    if ((w || h) && !devOpen) {
+      devOpen = true;
+      document.body.innerHTML = '<div style="padding:40px;font-family:monospace;color:#B83232">SESIÓN TERMINADA — Acceso no autorizado detectado.</div>';
+    }
+  }, 1000);
+
+  // Desactivar PrintScreen (parcial — solo JS, sin soporte OS-level sin Capacitor)
+  window.addEventListener('keyup', e => {
+    if (e.key === 'PrintScreen') {
+      navigator.clipboard?.writeText('').catch(() => {});
+    }
+  });
+})();
+
+/* ──────────────────────────────────
+   SESIÓN Y TOKEN
+   ────────────────────────────────── */
+const SESSION_TOKEN = (() => {
+  // En producción viene del JWT del servidor vía cookie HttpOnly
+  // Aquí simulamos con un token de sesión local para el prototipo
+  const stored = sessionStorage.getItem('_racreaa_session');
+  if (stored) return stored;
+  const token = 'SES-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2,8).toUpperCase();
+  sessionStorage.setItem('_racreaa_session', token);
+  return token;
+})();
+
+document.getElementById('session-id').textContent = SESSION_TOKEN.slice(0,16) + '…';
+
+/* ──────────────────────────────────
+   GPS — GEOLOCALIZACIÓN CONTINUA
+   ────────────────────────────────── */
+let currentGPS = null;
+let gpsWatchId = null;
+
+function initGPS() {
+  const dot    = document.getElementById('gps-dot');
+  const text   = document.getElementById('gps-text');
+  const coords = document.getElementById('gps-coords');
+  const acc    = document.getElementById('gps-accuracy');
+
+  if (!navigator.geolocation) {
+    dot.classList.add('error');
+    text.textContent = 'GPS no disponible en este dispositivo';
+    return;
+  }
+
+  text.textContent = 'Obteniendo posición...';
+
+  gpsWatchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      currentGPS = {
+        lat:       pos.coords.latitude,
+        lng:       pos.coords.longitude,
+        accuracy:  pos.coords.accuracy,
+        altitude:  pos.coords.altitude,
+        timestamp: pos.timestamp
+      };
+      dot.classList.remove('error');
+      dot.classList.add('active');
+      text.textContent = 'GPS activo';
+      coords.textContent = `${currentGPS.lat.toFixed(6)}, ${currentGPS.lng.toFixed(6)}`;
+      acc.textContent = `±${Math.round(currentGPS.accuracy)}m`;
+    },
+    (err) => {
+      dot.classList.add('error');
+      dot.classList.remove('active');
+      const msgs = {1:'Permiso denegado',2:'Posición no disponible',3:'Tiempo de espera agotado'};
+      text.textContent = msgs[err.code] || 'Error de GPS';
+      currentGPS = null;
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
+  );
+}
+
+initGPS();
+
+/* ──────────────────────────────────
+   MULTI-TENANT — CARGA DE BRANDING
+   ────────────────────────────────── */
+async function loadTenantBranding(tenantId) {
+  try {
+    // En producción: GET /api/tenant/${tenantId}/branding
+    // con Authorization: Bearer <jwt>
+    const res = await fetch(`/api/tenant/${tenantId}/branding`, {
+      headers: { 'Authorization': `Bearer ${SESSION_TOKEN}` }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+
+    // Aplicar colores
+    if (data.primaryColor) {
+      document.documentElement.style.setProperty('--tenant-primary', data.primaryColor);
+    }
+    if (data.secondaryColor) {
+      document.documentElement.style.setProperty('--tenant-secondary', data.secondaryColor);
+    }
+
+    // Cargar logo
+    if (data.logoUrl) {
+      const img = document.getElementById('tenant-logo-img');
+      const divider = document.getElementById('brand-divider');
+      img.src = data.logoUrl;
+      img.style.display = 'block';
+      divider.style.display = 'block';
+      // Preview en header: si el logo carga, mostrar; si falla, ocultar
+      img.onerror = () => { img.style.display = 'none'; divider.style.display = 'none'; };
+    }
+
+    // Nombre del tenant en el brand
+    if (data.brandName) {
+      document.getElementById('brand-dmz').textContent = data.brandName;
+    }
+  } catch (e) {
+    // Silencioso — fallback al branding DMZ por defecto
+    console.warn('[RACREAA] Branding fetch fallido, usando defaults.');
+  }
+}
+
+/* ──────────────────────────────────
+   DATOS Y CONSTANTES
+   ────────────────────────────────── */
+const CRIT = [
+  { key:'presentacion', label:'Presentación' },
+  { key:'temperatura',  label:'Temperatura'  },
+  { key:'sabor',        label:'Sabor'         },
+  { key:'textura',      label:'Textura'       },
+  { key:'porcion',      label:'Porción'       },
+];
+
+const CATS = ['Entrada','Sopa','Ensalada','Platillo fuerte','Guarnición','Postre','Bebida','Antojito','Otro'];
+
+const NIVELES = [
+  { key:'critico',    label:'Crítico',    min:0,  max:40,  color:'var(--red)',    lt:'var(--red-lt)'    },
+  { key:'deficiente', label:'Deficiente', min:40, max:55,  color:'var(--orange)', lt:'var(--orange-lt)' },
+  { key:'regular',    label:'Regular',    min:55, max:70,  color:'var(--yellow)', lt:'var(--yellow-lt)' },
+  { key:'bueno',      label:'Bueno',      min:70, max:85,  color:'var(--green)',  lt:'var(--green-lt)'  },
+  { key:'excelente',  label:'Excelente',  min:85, max:101, color:'var(--green2)', lt:'var(--green2-lt)' },
+];
+
+let cards = [], counter = 0;
+
+function getNivel(p) { return NIVELES.find(n => p >= n.min && p < n.max) || NIVELES[0]; }
+function getLetra(p) {
+  if(p>=90)return'A+'; if(p>=85)return'A';
+  if(p>=80)return'B+'; if(p>=70)return'B';
+  if(p>=55)return'C';  if(p>=40)return'D'; return'F';
+}
+
+/* ──────────────────────────────────
+   CAPTURA FOTOGRÁFICA ZERO-TRUST
+   ────────────────────────────────── */
+async function capturePhoto(cardId) {
+  // Obtener GPS al momento exacto de la captura
+  const gpsAtCapture = currentGPS ? { ...currentGPS } : null;
+
+  // Crear input dinámico con capture="environment" y sin acceso a galería
+  const input = document.createElement('input');
+  input.type    = 'file';
+  input.accept  = 'image/*';
+  // capture="environment" fuerza cámara trasera en móvil
+  // En iOS Safari y Android Chrome esto deshabilita la galería automáticamente
+  input.setAttribute('capture', 'environment');
+  // Sin 'multiple' — una captura por vez para trazabilidad
+  input.style.display = 'none';
+  document.body.appendChild(input);
+
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) { document.body.removeChild(input); return; }
+
+    // Validar tipo MIME estrictamente
+    if (!file.type.startsWith('image/')) {
+      alert('Solo se aceptan imágenes capturadas en tiempo real.');
+      document.body.removeChild(input);
+      return;
+    }
+
+    // Validar tamaño máximo (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('La imagen supera el tamaño máximo permitido (10MB).');
+      document.body.removeChild(input);
+      return;
+    }
+
+    // Leer como base64 para payload seguro
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const base64 = ev.target.result;
+      const card = cards.find(c => c.id === cardId);
+      if (!card) return;
+
+      if (!card.evidence) card.evidence = [];
+
+      const evidenceItem = {
+        id:          'ev-' + Date.now(),
+        base64,
+        mimeType:    file.type,
+        sizeBytes:   file.size,
+        capturedAt:  new Date().toISOString(),
+        gps:         gpsAtCapture,
+        gpsVerified: !!gpsAtCapture,
+        sessionToken: SESSION_TOKEN
+      };
+
+      card.evidence.push(evidenceItem);
+      renderEvidenceThumb(cardId, evidenceItem);
+    };
+    reader.readAsDataURL(file);
+    document.body.removeChild(input);
+  };
+
+  // Si GPS no disponible, advertir pero no bloquear
+  if (!gpsAtCapture) {
+    const proceed = confirm('ADVERTENCIA: Las coordenadas GPS no están disponibles en este momento. La imagen no tendrá geolocalización verificada. ¿Continuar de todas formas?');
+    if (!proceed) { document.body.removeChild(input); return; }
+  }
+
+  input.click();
+}
+
+function renderEvidenceThumb(cardId, ev) {
+  const zone = document.getElementById(`ev-zone-${cardId}`);
+  if (!zone) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'evidence-thumb';
+  wrap.id = ev.id;
+
+  const gpsLabel = ev.gpsVerified
+    ? `${ev.gps.lat.toFixed(5)},${ev.gps.lng.toFixed(5)}`
+    : 'Sin GPS';
+
+  wrap.innerHTML = `
+    <img src="${ev.base64}" alt="Evidencia">
+    <div class="gps-stamp">${gpsLabel}<br>${ev.capturedAt.slice(11,19)}</div>
+    <button class="del-thumb" onclick="removeEvidence('${cardId}','${ev.id}')">×</button>
+  `;
+  zone.appendChild(wrap);
+}
+
+function removeEvidence(cardId, evId) {
+  const card = cards.find(c => c.id === cardId);
+  if (!card) return;
+  card.evidence = (card.evidence || []).filter(e => e.id !== evId);
+  const el = document.getElementById(evId);
+  if (el) el.remove();
+}
+
+/* ──────────────────────────────────
+   TARJETAS DE PLATILLO
+   ────────────────────────────────── */
+function addCard() {
+  counter++;
+  const id = 'c' + Date.now();
+  const data = { id, num: counter, nombre:'', categoria:'', obs:'', criterios:{}, evidence:[], _pct:undefined, _nivel:'' };
+  CRIT.forEach(c => data.criterios[c.key] = 0);
+  cards.push(data);
+
+  const wrap = document.getElementById('cards-col');
+  const div  = document.createElement('div');
+  div.className = 'platillo-card'; div.id = id;
+
+  const catOpts = CATS.map(c => `<option>${c}</option>`).join('');
+  const critRows = CRIT.map(c => `
+    <div class="criterio-row" data-crit="${c.key}">
+      <span class="crit-label">${c.label}</span>
+      <div class="stars">${[1,2,3,4,5].map(i=>`<span class="star" onclick="setStar('${id}','${c.key}',${i})">&#9733;</span>`).join('')}</div>
+      <div class="score-bar-wrap"><div class="score-bar-fill" id="b-${id}-${c.key}" style="width:0"></div></div>
+      <span class="crit-score" id="s-${id}-${c.key}">—</span>
+    </div>`).join('');
+
+  div.innerHTML = `
+    <button class="btn-del" onclick="delCard('${id}')">&#215;</button>
+    <div class="card-top">
+      <span class="card-num">${String(counter).padStart(2,'0')}</span>
+      <div class="card-fields">
+        <div class="field-row">
+          <input class="f-name" placeholder="Nombre del platillo" oninput="upd('${id}','nombre',this.value)">
+          <select class="f-cat" onchange="upd('${id}','categoria',this.value)">
+            <option value="">Categoría…</option>${catOpts}
+          </select>
+        </div>
+        <div class="criterios">${critRows}</div>
+      </div>
+    </div>
+    <div class="evidence-zone" id="ev-zone-${id}">
+      <button class="btn-capture" onclick="capturePhoto('${id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        Capturar evidencia
+      </button>
+    </div>
+    <div class="card-footer">
+      <textarea class="card-obs" placeholder="Observaciones del platillo…" oninput="upd('${id}','obs',this.value)"></textarea>
+      <div class="card-total">
+        <div class="total-ring" id="tr-${id}">
+          <span class="total-n" id="tn-${id}">—</span>
+          <span class="total-sub">/ 100</span>
+        </div>
+        <span class="nivel-tag" id="nt-${id}">—</span>
+      </div>
+    </div>`;
+
+  wrap.appendChild(div);
+  updateGlobal();
+}
+
+function setStar(id, crit, val) {
+  const d = cards.find(c => c.id === id); if (!d) return;
+  d.criterios[crit] = val;
+  const card = document.getElementById(id);
+  const row  = card.querySelector(`.criterio-row[data-crit="${crit}"]`);
+  if (row) row.querySelectorAll('.star').forEach((s,i) => s.classList.toggle('on', i < val));
+  const bar = document.getElementById(`b-${id}-${crit}`);
+  if (bar) bar.style.width = (val * 20) + '%';
+  const sc = document.getElementById(`s-${id}-${crit}`);
+  if (sc) sc.textContent = val;
+  calcCard(d); updateGlobal();
+}
+
+function calcCard(d) {
+  const vals = Object.values(d.criterios);
+  const sum  = vals.reduce((a,b)=>a+b,0);
+  if (!sum) return;
+  const pct = Math.round((sum / (CRIT.length * 5)) * 100);
+  const niv = getNivel(pct);
+  d._pct = pct; d._nivel = niv.key;
+  const tr   = document.getElementById(`tr-${d.id}`);
+  const tn   = document.getElementById(`tn-${d.id}`);
+  const nt   = document.getElementById(`nt-${d.id}`);
+  const card = document.getElementById(d.id);
+  if (tn) tn.textContent = pct;
+  if (tr) tr.style.borderColor = niv.color;
+  if (nt) { nt.textContent = niv.label; nt.style.background = niv.lt; nt.style.color = niv.color; }
+  if (card) card.setAttribute('data-nivel', niv.key);
+}
+
+function upd(id, field, val) { const d = cards.find(c=>c.id===id); if(d) d[field]=val; }
+
+function delCard(id) {
+  cards = cards.filter(c => c.id !== id);
+  const el = document.getElementById(id); if(el) el.remove();
+  updateGlobal();
+}
+
+function updateGlobal() {
+  const ev = cards.filter(c => c._pct !== undefined);
+  document.getElementById('r-total').textContent = cards.length;
+
+  if (!ev.length) {
+    ['r-prom','r-letra','r-nivel','global-num'].forEach(id => {
+      const el = document.getElementById(id); if(el){el.textContent='—';el.style.color='';}
+    });
+    NIVELES.forEach(n => document.getElementById('sem-'+n.key).classList.remove('active'));
+    document.getElementById('nivel-needle').style.left = '50%';
+    document.getElementById('dist-list').innerHTML = '';
+    document.getElementById('cs-list').innerHTML = '';
+    return;
+  }
+
+  const avg = Math.round(ev.reduce((a,c)=>a+c._pct,0)/ev.length);
+  const niv = getNivel(avg);
+  const letra = getLetra(avg);
+
+  document.getElementById('r-prom').textContent = avg;
+  const rl = document.getElementById('r-letra'); if(rl){rl.textContent=letra;rl.style.color=niv.color;}
+  const rn = document.getElementById('r-nivel'); if(rn){rn.textContent=niv.label;rn.style.color=niv.color;}
+  document.getElementById('global-num').textContent = avg;
+
+  NIVELES.forEach(n => {
+    const dot = document.getElementById('sem-'+n.key);
+    if(dot) dot.classList.toggle('active', n.key === niv.key);
+  });
+  document.getElementById('nivel-needle').style.left = avg + '%';
+
+  // Distribución
+  const dl = document.getElementById('dist-list'); dl.innerHTML = '';
+  [...NIVELES].reverse().forEach(n => {
+    const cnt = ev.filter(c=>c._nivel===n.key).length;
+    const pct = Math.round((cnt/ev.length)*100);
+    const row = document.createElement('div'); row.className='dist-row';
+    row.innerHTML=`<div class="dist-dot" style="background:${n.color}"></div>
+      <span class="dist-name">${n.label}</span>
+      <div class="dist-bw"><div class="dist-bf" style="width:${pct}%;background:${n.color}"></div></div>
+      <span class="dist-count">${cnt}</span><span class="dist-pct">${pct}%</span>`;
+    dl.appendChild(row);
+  });
+
+  // Criterios
+  const cl = document.getElementById('cs-list'); cl.innerHTML = '';
+  CRIT.forEach(c => {
+    const vals = ev.map(e=>e.criterios[c.key]).filter(v=>v>0);
+    if (!vals.length) return;
+    const a5 = (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1);
+    const pct = Math.round((a5/5)*100);
+    const row = document.createElement('div'); row.className='cs-row';
+    row.innerHTML=`<span class="cs-name">${c.label}</span>
+      <div class="cs-bw"><div class="cs-bf" style="width:${pct}%"></div></div>
+      <span class="cs-val">${a5}</span>`;
+    cl.appendChild(row);
+  });
+}
+
+/* ──────────────────────────────────
+   FIRMA DIGITAL — CANVAS
+   ────────────────────────────────── */
+(function initSignature() {
+  const canvas = document.getElementById('sig-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+  let lastX = 0, lastY = 0;
+
+  ctx.strokeStyle = '#2C2A24';
+  ctx.lineWidth   = 1.5;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+
+  function getPos(e) {
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return [(t.clientX - r.left) * (canvas.width / r.width),
+            (t.clientY - r.top)  * (canvas.height / r.height)];
+  }
+
+  function startDraw(e) { e.preventDefault(); drawing=true; [lastX,lastY]=getPos(e); }
+  function draw(e) {
+    if (!drawing) return; e.preventDefault();
+    const [x,y] = getPos(e);
+    ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(x,y); ctx.stroke();
+    [lastX,lastY] = [x,y];
+  }
+  function stopDraw() { drawing = false; }
+
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup',   stopDraw);
+  canvas.addEventListener('mouseleave',stopDraw);
+  canvas.addEventListener('touchstart', startDraw, {passive:false});
+  canvas.addEventListener('touchmove',  draw,      {passive:false});
+  canvas.addEventListener('touchend',   stopDraw);
+})();
+
+function clearSignature() {
+  const canvas = document.getElementById('sig-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function getSignatureDataURL() {
+  const canvas = document.getElementById('sig-canvas');
+  // Verificar si el canvas está vacío
+  const ctx = canvas.getContext('2d');
+  const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  const isEmpty = !data.some(v => v !== 0);
+  return isEmpty ? null : canvas.toDataURL('image/png');
+}
+
+/* ──────────────────────────────────
+   SUBMIT AUDIT — PAYLOAD SEGURO
+   ────────────────────────────────── */
+async function submitAudit() {
+  const btn    = document.getElementById('btn-submit');
+  const status = document.getElementById('submit-status');
+  const msg    = document.getElementById('submit-msg');
+
+  // Validaciones previas
+  if (!cards.length) {
+    showStatus('error', 'Debe agregar al menos un platillo antes de enviar.'); return;
+  }
+
+  const evaluatedCards = cards.filter(c => c._pct !== undefined);
+  if (!evaluatedCards.length) {
+    showStatus('error', 'Debe calificar al menos un platillo antes de enviar.'); return;
+  }
+
+  const auditor = document.getElementById('fa').value.trim();
+  if (!auditor) {
+    showStatus('error', 'El campo "Auditor DMZ" es obligatorio.'); return;
+  }
+
+  // GPS obligatorio para producción
+  if (!currentGPS) {
+    const proceed = confirm('Las coordenadas GPS no están disponibles. El reporte no tendrá geolocalización verificada. ¿Continuar?');
+    if (!proceed) return;
+  }
+
+  // Firma digital
+  const signatureDataURL = getSignatureDataURL();
+
+  // Armar payload
+  const payload = {
+    sessionToken:    SESSION_TOKEN,
+    submittedAt:     new Date().toISOString(),
+    gpsAtSubmission: currentGPS,
+    establecimiento: document.getElementById('m-est').value.trim(),
+    auditor:         document.getElementById('m-aud').value.trim(),
+    fecha:           document.getElementById('m-fecha').value,
+    servicio:        document.getElementById('m-srv').value.trim(),
+    auditorFirma:    auditor,
+    chefFirma:       document.getElementById('fc').value.trim(),
+    signatureImage:  signatureDataURL,
+    conclusion:      document.getElementById('conclusion').value.trim(),
+    globalScore:     (() => { const ev=cards.filter(c=>c._pct!==undefined); return ev.length ? Math.round(ev.reduce((a,c)=>a+c._pct,0)/ev.length) : 0; })(),
+    items: cards.map(c => ({
+      id:          c.id,
+      num:         c.num,
+      nombre:      c.nombre,
+      categoria:   c.categoria,
+      criterios:   c.criterios,
+      score:       c._pct || 0,
+      nivel:       c._nivel,
+      observaciones: c.obs,
+      evidence:    (c.evidence || []).map(e => ({
+        id:         e.id,
+        base64:     e.base64,
+        mimeType:   e.mimeType,
+        sizeBytes:  e.sizeBytes,
+        capturedAt: e.capturedAt,
+        gps:        e.gps,
+        gpsVerified:e.gpsVerified
+      }))
+    }))
+  };
+
+  // Envío
+  btn.disabled = true;
+  showStatus('loading', 'Cifrando y enviando evaluación...');
+
+  try {
+    const res = await fetch('/api/submit-audit', {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${SESSION_TOKEN}`,
+        'X-Client-GPS':  currentGPS ? `${currentGPS.lat},${currentGPS.lng}` : 'unavailable',
+        'X-Request-ID':  'REQ-' + Date.now().toString(36).toUpperCase()
+      },
+      body: JSON.stringify(payload),
+      credentials: 'include' // incluir cookies HttpOnly del JWT
+    });
+
+    const result = await res.json();
+
+    if (res.ok && result.success) {
+      showStatus('success', `Evaluación registrada. ID: ${result.auditId}`);
+    } else {
+      showStatus('error', result.message || `Error ${res.status}: No se pudo registrar la evaluación.`);
+      btn.disabled = false;
+    }
+  } catch (err) {
+    showStatus('error', 'Error de red. Verifique su conexión e intente nuevamente.');
+    btn.disabled = false;
+    console.error('[RACREAA] Submit error:', err);
+  }
+}
+
+function showStatus(type, message) {
+  const status = document.getElementById('submit-status');
+  const msg    = document.getElementById('submit-msg');
+  status.className = `submit-status visible ${type}`;
+  msg.textContent  = message;
+  // Ocultar spinner si no es loading
+  const spinner = status.querySelector('.spinner');
+  if (spinner) spinner.style.display = type === 'loading' ? 'block' : 'none';
+}
+
+function limpiar() {
+  if (!confirm('¿Iniciar nueva evaluación? Se perderán los datos no enviados.')) return;
+  cards=[]; counter=0;
+  document.getElementById('cards-col').innerHTML='';
+  ['m-est','m-aud','m-srv','conclusion','fa','fc'].forEach(id=>{
+    const el=document.getElementById(id); if(el)el.value='';
+  });
+  document.getElementById('m-fecha').value='';
+  clearSignature();
+  document.getElementById('btn-submit').disabled=false;
+  document.getElementById('submit-status').className='submit-status';
+  updateGlobal();
+}
+
+/* ──────────────────────────────────
+   INIT
+   ────────────────────────────────── */
+document.getElementById('m-fecha').value = new Date().toISOString().split('T')[0];
+addCard(); addCard(); addCard();
+
+// Cargar branding del tenant desde query param (en producción viene del JWT)
+const urlParams = new URLSearchParams(window.location.search);
+const tenantId  = urlParams.get('tenant');
+if (tenantId) loadTenantBranding(tenantId);
+</script>
+</body>
+</html>

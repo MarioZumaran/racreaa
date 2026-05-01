@@ -1,0 +1,16 @@
+{
+  "name": "DMZ Audit — Kitchen Support",
+  "short_name": "DMZ Audit",
+  "description": "Plataforma de auditoría operativa De La Mora Zumarán",
+  "start_url": "/app.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAFAF7",
+  "theme_color": "#2C2A24",
+  "icons": [
+    { "src": "/logo-dmz.jpg", "sizes": "192x192", "type": "image/jpeg", "purpose": "any maskable" },
+    { "src": "/logo-dmz.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any maskable" }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "es"
+}
