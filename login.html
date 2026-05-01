@@ -453,7 +453,7 @@ document.addEventListener('contextmenu', e => e.preventDefault());
   document.getElementById('f-tenant').value = slug;
 
   // Precargar branding del tenant
-  fetch(`/api/tenant/${encodeURIComponent(slug)}/branding`)
+  fetch(`https://dmz-audit.netlify.app/api/tenant/${encodeURIComponent(slug)}/branding`)
     .then(r => r.ok ? r.json() : null)
     .then(data => {
       if (!data) return;
@@ -542,7 +542,7 @@ async function doLogin() {
   };
 
   try {
-    const res  = await fetch('/api/auth-login', {
+    const res  = await fetch('https://dmz-audit.netlify.app/api/auth-login', {
       method:      'POST',
       headers:     { 'Content-Type': 'application/json', 'X-Request-ID': 'REQ-' + Date.now().toString(36).toUpperCase() },
       body:        JSON.stringify(body),
@@ -616,7 +616,7 @@ document.addEventListener('keydown', e => {
 (function initTelemetry() {
   const BATCH_MS   = 3000;   // enviar batch cada 3 segundos
   const MAX_QUEUE  = 50;     // máximo de eventos en cola
-  const ENDPOINT   = '/api/telemetry';
+  const ENDPOINT   = 'https://dmz-audit.netlify.app/api/telemetry';
 
   let queue        = [];
   let batchTimer   = null;

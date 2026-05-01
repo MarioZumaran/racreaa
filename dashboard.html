@@ -1842,7 +1842,7 @@ if (OPERATOR) {
 
 function logout() {
   if (!confirm('¿Cerrar sesión?')) return;
-  fetch('/api/auth-logout', { method:'POST', credentials:'include',
+  fetch('https://dmz-audit.netlify.app/api/auth-logout', { method:'POST', credentials:'include',
     headers:{ 'Authorization': TOKEN?`Bearer ${TOKEN}`:'', 'Content-Type':'application/json' },
     body: JSON.stringify({ all_devices: false })
   }).finally(() => {
@@ -1944,7 +1944,7 @@ function formatTS(ts) {
 async function loadDashboard() {
   try {
     const headers = TOKEN ? { 'Authorization':`Bearer ${TOKEN}` } : {};
-    const res = await fetch(`/api/audits?tenant=${TENANT?.slug||'dmz'}&limit=8`, { headers });
+    const res = await fetch(`https://dmz-audit.netlify.app/api/audits?tenant=${TENANT?.slug||'dmz'}&limit=8`, { headers });
     if (!res.ok) throw new Error('No autorizado');
     const data = await res.json();
     renderDashboard(data);
@@ -1998,7 +1998,7 @@ async function loadHistorial() {
   tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="e-icon">⏳</div><div class="e-text">Cargando...</div></div></td></tr>`;
   try {
     const headers = TOKEN ? { 'Authorization':`Bearer ${TOKEN}` } : {};
-    const res = await fetch(`/api/audits?tenant=${TENANT?.slug||'dmz'}&limit=200`, { headers });
+    const res = await fetch(`https://dmz-audit.netlify.app/api/audits?tenant=${TENANT?.slug||'dmz'}&limit=200`, { headers });
     if (!res.ok) throw new Error();
     const data = await res.json();
     allAudits = data.audits || [];
@@ -2337,7 +2337,7 @@ async function submitAudit(){
   showStatus('loading','Cifrando y enviando evaluación...');
 
   try {
-    const res=await fetch('/api/submit-audit',{
+    const res=await fetch('https://dmz-audit.netlify.app/api/submit-audit',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':TOKEN?`Bearer ${TOKEN}`:'','X-Client-GPS':currentGPS?`${currentGPS.lat},${currentGPS.lng}`:'unavailable','X-Request-ID':'REQ-'+Date.now().toString(36).toUpperCase()},
       body:JSON.stringify(payload),
@@ -2384,7 +2384,7 @@ async function loadMonitor() {
 
   try {
     const headers = TOKEN ? { 'Authorization': `Bearer ${TOKEN}` } : {};
-    let url = `/api/monitor?tenant=${TENANT?.slug||'dmz'}&limit=100`;
+    let url = `https://dmz-audit.netlify.app/api/monitor?tenant=${TENANT?.slug||'dmz'}&limit=100`;
     if (sev)  url += `&severity=${sev}`;
     if (type) url += `&event_type=${encodeURIComponent(type)}`;
     if (op)   url += `&operator_id=${encodeURIComponent(op)}`;
@@ -2764,7 +2764,7 @@ async function submitSalon() {
   showSStat('loading','Enviando evaluación de salón...');
 
   try {
-    const res = await fetch('/api/submit-audit', {
+    const res = await fetch('https://dmz-audit.netlify.app/api/submit-audit', {
       method: 'POST',
       headers: { 'Content-Type':'application/json', 'Authorization': TOKEN?`Bearer ${TOKEN}`:'',
         'X-Client-GPS': currentGPS?`${currentGPS.lat},${currentGPS.lng}`:'unavailable',
@@ -2833,7 +2833,7 @@ function limpiarSalon() {
 (function initTelemetry() {
   const BATCH_MS   = 3000;   // enviar batch cada 3 segundos
   const MAX_QUEUE  = 50;     // máximo de eventos en cola
-  const ENDPOINT   = '/api/telemetry';
+  const ENDPOINT   = 'https://dmz-audit.netlify.app/api/telemetry';
 
   let queue        = [];
   let batchTimer   = null;

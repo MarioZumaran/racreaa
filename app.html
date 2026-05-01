@@ -1001,7 +1001,7 @@ function getNivel(s){ return NMAP[getNKey(s)]; }
 /* ── LOAD HOME ── */
 async function loadHome() {
   try {
-    const res = await fetch(`/api/audits?tenant=${TENANT.slug}&limit=5`, { headers:{ 'Authorization':`Bearer ${TOKEN}` } });
+    const res = await fetch(`https://dmz-audit.netlify.app/api/audits?tenant=${TENANT.slug}&limit=5`, { headers:{ 'Authorization':`Bearer ${TOKEN}` } });
     const data = await res.json();
     const audits = data.audits || [];
     document.getElementById('h-total').textContent = data.total || 0;
@@ -1036,7 +1036,7 @@ async function loadHist() {
   const el = document.getElementById('hist-list');
   el.innerHTML = '<div class="spinner-m"></div>';
   try {
-    const res = await fetch(`/api/audits?tenant=${TENANT.slug}&limit=50`, { headers:{ 'Authorization':`Bearer ${TOKEN}` } });
+    const res = await fetch(`https://dmz-audit.netlify.app/api/audits?tenant=${TENANT.slug}&limit=50`, { headers:{ 'Authorization':`Bearer ${TOKEN}` } });
     const data = await res.json();
     const audits = data.audits || [];
     if (!audits.length) { el.innerHTML = '<div style="text-align:center;color:var(--text3);padding:32px;font-size:12px;">Sin evaluaciones registradas.</div>'; return; }
@@ -1398,7 +1398,7 @@ async function submitFromSheet() {
   }
 
   try {
-    const res = await fetch('/api/submit-audit', {
+    const res = await fetch('https://dmz-audit.netlify.app/api/submit-audit', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${TOKEN}`,
         'X-Client-GPS':GPS?`${GPS.lat},${GPS.lng}`:'unavailable',
@@ -1535,7 +1535,7 @@ function tickTimerM(){
 /* ── LOGOUT ── */
 function logout(){
   if(!confirm('¿Cerrar sesión?'))return;
-  fetch('/api/auth-logout',{method:'POST',credentials:'include',headers:{'Authorization':`Bearer ${TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({all_devices:false})})
+  fetch('https://dmz-audit.netlify.app/api/auth-logout',{method:'POST',credentials:'include',headers:{'Authorization':`Bearer ${TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({all_devices:false})})
     .finally(()=>{sessionStorage.clear();window.location.href='/login.html';});
 }
 
@@ -1553,7 +1553,7 @@ loadHome();
 (function initTelemetry() {
   const BATCH_MS   = 3000;   // enviar batch cada 3 segundos
   const MAX_QUEUE  = 50;     // máximo de eventos en cola
-  const ENDPOINT   = '/api/telemetry';
+  const ENDPOINT   = 'https://dmz-audit.netlify.app/api/telemetry';
 
   let queue        = [];
   let batchTimer   = null;
