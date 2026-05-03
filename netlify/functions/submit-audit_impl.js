@@ -260,8 +260,8 @@ module.exports = async function handler(req, res) {
 
   } catch(err) {
     await client.query('ROLLBACK').catch(()=>{});
-    console.error('[submit-audit]', err.message);
-    return res.status(500).json({success:false, message:'Error interno al guardar.'});
+    console.error('[submit-audit] ERROR:', err.message, err.stack?.slice(0,300));
+    return res.status(500).json({success:false, message:'Error interno al guardar.', detail: err.message});
   } finally {
     client.release();
   }
