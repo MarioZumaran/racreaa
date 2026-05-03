@@ -13,3 +13,5 @@
 /api/monitor          /.netlify/functions/monitor          200
 /api/health           /.netlify/functions/health           200
 /api/tenant-branding  /.netlify/functions/tenant-branding  200
+/api/audit-session       /.netlify/functions/audit-session       200
+/api/migrate-session     /.netlify/functions/migrate-session     200
