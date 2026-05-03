@@ -1,32 +1,63 @@
 /**
  * audit-session.js — Netlify Function wrapper
- * Routes to audit-session_impl.js
+ * Collaborative session management — DMZ Audit
  */
-const impl = require('./audit-session_impl');
+const handler_module = require('./audit-session_impl');
+
+const CORS_ORIGINS = [
+  'https://mariozumaran.github.io',
+  'https://dmzkitchensupport.github.io',
+  'https://dmz-audit.netlify.app',
+  ...(process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean)
+];
 
 exports.handler = async (event, context) => {
+  const origin = event.headers['origin'] || event.headers['Origin'] || '';
+  const allowOrigin = CORS_ORIGINS.includes(origin) ? origin : CORS_ORIGINS[0];
+
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
+      headers: {
+        'Access-Control-Allow-Origin': allowOrigin,
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Request-ID',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Max-Age': '86400',
+      },
+      body: '',
+    };
+  }
+
   const req = {
-    method:  event.httpMethod,
+    method: event.httpMethod,
     headers: event.headers || {},
-    query:   event.queryStringParameters || {},
-    body:    event.body ? JSON.parse(event.body) : {},
+    body: (() => {
+      if (!event.body) return {};
+      try { return JSON.parse(event.body); } catch { return {}; }
+    })(),
+    query: event.queryStringParameters || {},
+    socket: { remoteAddress: (event.headers['x-forwarded-for'] || '').split(',')[0].trim() || '' },
   };
-  const chunks = [];
+
+  let statusCode = 200;
+  const responseHeaders = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Credentials': 'true',
+    'Vary': 'Origin',
+  };
+  let responseBody = '';
+
   const res = {
-    statusCode: 200,
-    headers: {},
-    _body: '',
-    setHeader(k, v) { this.headers[k] = v; },
-    status(code) { this.statusCode = code; return this; },
-    json(data) { this._body = JSON.stringify(data); this.headers['Content-Type'] = 'application/json'; },
-    end() {},
+    setHeader: (k, v) => { responseHeaders[k] = v; },
+    status: (code) => { statusCode = code; return res; },
+    json: (data) => { responseBody = JSON.stringify(data); return res; },
+    end: (body) => { if (body) responseBody = body; return res; },
+    send: (body) => { responseBody = typeof body === 'object' ? JSON.stringify(body) : body; return res; },
   };
 
-  await impl(req, res);
+  await handler_module(req, res);
 
-  return {
-    statusCode: res.statusCode,
-    headers:    res.headers,
-    body:       res._body,
-  };
+  return { statusCode, headers: responseHeaders, body: responseBody };
 };
