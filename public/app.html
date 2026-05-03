@@ -873,6 +873,72 @@ body::after {
   touch-action: manipulation;
 }
 .timer-btn-m.active { background:var(--gold); color:var(--dark); border-color:var(--gold); }
+
+/* ══ COLLABORATIVE SESSION ══ */
+.collab-bar {
+  display:none; background:#1A3A1A; border:1px solid #2E7D52;
+  border-radius:8px; padding:10px 14px; margin:10px 0;
+  font-size:12px; color:#A8D5B5; gap:8px; align-items:center;
+}
+.collab-bar.active { display:flex; }
+.collab-bar .cb-code { font-weight:700; color:#C4922A; font-family:monospace; font-size:15px; letter-spacing:2px; }
+.collab-bar .cb-section { color:#FAFAF7; font-weight:600; }
+.collab-bar .cb-peers { margin-left:auto; font-size:11px; color:#A8D5B5; }
+
+.session-modal-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.75);
+  z-index:9000; align-items:center; justify-content:center; padding:16px;
+}
+.session-modal-overlay.open { display:flex; }
+.session-modal {
+  background:#2C2A24; border:1px solid #C4922A; border-radius:12px;
+  padding:24px; width:100%; max-width:360px;
+}
+.session-modal h3 {
+  font-size:13px; letter-spacing:3px; text-transform:uppercase;
+  color:#C4922A; margin:0 0 16px 0; font-weight:700;
+}
+.session-modal .sm-tabs {
+  display:flex; gap:4px; margin-bottom:16px;
+}
+.session-modal .sm-tab {
+  flex:1; padding:8px; border:1px solid #5C5A54; background:transparent;
+  color:#9A9890; font-size:12px; border-radius:6px; cursor:pointer;
+}
+.session-modal .sm-tab.active { background:#C4922A; color:#2C2A24; border-color:#C4922A; font-weight:700; }
+.session-modal label { display:block; font-size:10px; letter-spacing:1px; color:#9A9890; text-transform:uppercase; margin-bottom:4px; }
+.session-modal input, .session-modal select {
+  width:100%; background:#1C1A14; border:1px solid #5C5A54; color:#FAFAF7;
+  border-radius:6px; padding:10px; font-size:14px; margin-bottom:12px; box-sizing:border-box;
+}
+.session-modal .sm-code-display {
+  text-align:center; background:#1C1A14; border:1px solid #C4922A;
+  border-radius:8px; padding:16px; margin:12px 0;
+}
+.session-modal .sm-code-display .sm-code {
+  font-size:32px; font-weight:900; color:#C4922A; letter-spacing:6px; font-family:monospace;
+}
+.session-modal .sm-code-display .sm-code-hint {
+  font-size:10px; color:#9A9890; margin-top:4px; letter-spacing:1px;
+}
+.session-modal .sm-peers { font-size:12px; color:#A8D5B5; margin:8px 0; min-height:20px; }
+.session-modal .sm-section-lock {
+  display:flex; gap:6px; flex-wrap:wrap; margin:8px 0;
+}
+.session-modal .sm-lock-pill {
+  padding:4px 10px; border-radius:20px; font-size:10px; font-weight:700;
+  background:#1C1A14; border:1px solid #5C5A54; color:#9A9890;
+}
+.session-modal .sm-lock-pill.taken { border-color:#C4922A; color:#C4922A; }
+.session-modal .sm-lock-pill.mine  { background:#C4922A; color:#2C2A24; border-color:#C4922A; }
+.session-modal .sm-lock-pill.available { border-color:#2E7D52; color:#A8D5B5; }
+.btn-session {
+  display:flex; align-items:center; gap:6px; width:100%;
+  background:transparent; border:1px solid #C4922A; color:#C4922A;
+  border-radius:8px; padding:10px 14px; font-size:12px; font-weight:700;
+  letter-spacing:1px; cursor:pointer; margin-top:8px;
+}
+.btn-session:hover { background:#C4922A22; }
 </style>
 </head>
 <body>
@@ -927,6 +993,19 @@ body::after {
     </button>
     <button class="btn-primary" onclick="showView('salon')" style="background:var(--dark);margin-top:8px;">
       + Nueva Evaluación · Salón
+    </button>
+
+    <!-- COLLABORATIVE SESSION BAR -->
+    <div class="collab-bar" id="collab-bar">
+      <span>SESIÓN</span>
+      <span class="cb-code" id="cb-code-display">——</span>
+      <span>·</span>
+      <span class="cb-section" id="cb-section-display">—</span>
+      <span class="cb-peers" id="cb-peers-display"></span>
+      <button onclick="openSessionModal()" style="background:transparent;border:none;color:#C4922A;cursor:pointer;font-size:11px;padding:0 4px;">Gestionar</button>
+    </div>
+    <button class="btn-session" onclick="openSessionModal()">
+      Sesión colaborativa
     </button>
 
     <div class="section-lbl">Últimas evaluaciones</div>
@@ -2265,5 +2344,251 @@ loadHome();
 })();
 
 </script>
+
+<!-- ════ COLLABORATIVE SESSION MODAL ════ -->
+<div class="session-modal-overlay" id="session-modal-overlay" onclick="if(event.target===this)closeSessionModal()">
+  <div class="session-modal">
+    <h3>Sesión Colaborativa</h3>
+    <div class="sm-tabs">
+      <button class="sm-tab active" id="sm-tab-create" onclick="switchSmTab('create')">Crear</button>
+      <button class="sm-tab" id="sm-tab-join" onclick="switchSmTab('join')">Unirse</button>
+      <button class="sm-tab" id="sm-tab-status" onclick="switchSmTab('status')">Estado</button>
+    </div>
+
+    <!-- CREATE TAB -->
+    <div id="sm-pane-create">
+      <label>Tu sección</label>
+      <select id="sm-create-section">
+        <option value="alimentos">Alimentos</option>
+        <option value="salon">Salón</option>
+        <option value="fotos">Evidencia fotográfica</option>
+      </select>
+      <label>Establecimiento</label>
+      <input type="text" id="sm-create-est" placeholder="Nombre del establecimiento">
+      <label>Fecha</label>
+      <input type="date" id="sm-create-fecha">
+      <button class="btn-primary" onclick="createSession()" style="margin-top:4px;">Crear sesión</button>
+      <div id="sm-create-result" style="display:none">
+        <div class="sm-code-display">
+          <div class="sm-code" id="sm-code-out">——</div>
+          <div class="sm-code-hint">Comparte este código con los auditores</div>
+        </div>
+        <div class="sm-peers" id="sm-create-peers"></div>
+      </div>
+    </div>
+
+    <!-- JOIN TAB -->
+    <div id="sm-pane-join" style="display:none">
+      <label>Código de sesión</label>
+      <input type="text" id="sm-join-code" maxlength="6" placeholder="XXXXXX" style="text-transform:uppercase;letter-spacing:4px;font-size:18px;text-align:center">
+      <label>Tu sección</label>
+      <select id="sm-join-section">
+        <option value="alimentos">Alimentos</option>
+        <option value="salon">Salón</option>
+        <option value="fotos">Evidencia fotográfica</option>
+      </select>
+      <button class="btn-primary" onclick="joinSession()" style="margin-top:4px;">Unirse a sesión</button>
+      <div class="sm-peers" id="sm-join-msg"></div>
+    </div>
+
+    <!-- STATUS TAB -->
+    <div id="sm-pane-status" style="display:none">
+      <div id="sm-status-content">
+        <div style="color:#9A9890;font-size:12px;text-align:center;padding:16px">Sin sesión activa</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn-session" onclick="pollSessionStatus()" style="flex:1;justify-content:center">Actualizar</button>
+        <button class="btn-session" onclick="leaveSession()" style="flex:1;justify-content:center;border-color:#B83232;color:#B83232" id="sm-leave-btn">Salir</button>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;text-align:right">
+      <button onclick="closeSessionModal()" style="background:transparent;border:none;color:#9A9890;font-size:11px;cursor:pointer;letter-spacing:1px">CERRAR</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════
+ * COLLABORATIVE SESSION — DMZ Audit
+ * ════════════════════════════════════════════════════ */
+const API_SESSION = 'https://dmz-audit.netlify.app/api/audit-session';
+
+let SESSION = {
+  active:   false,
+  code:     null,
+  id:       null,
+  section:  null,
+  isHost:   false,
+  locks:    {},
+  pollTimer: null,
+};
+
+/* ── Modal control ── */
+function openSessionModal() {
+  document.getElementById('session-modal-overlay').classList.add('open');
+  if (SESSION.active) switchSmTab('status');
+}
+function closeSessionModal() {
+  document.getElementById('session-modal-overlay').classList.remove('open');
+}
+function switchSmTab(tab) {
+  ['create','join','status'].forEach(t => {
+    document.getElementById('sm-tab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('sm-pane-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+  if (tab==='status') pollSessionStatus();
+}
+
+/* ── Create session ── */
+async function createSession() {
+  const section = document.getElementById('sm-create-section').value;
+  const est     = document.getElementById('sm-create-est').value.trim();
+  const fecha   = document.getElementById('sm-create-fecha').value;
+  try {
+    const r = await fetch(API_SESSION + '?action=create', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${TOKEN}` },
+      body: JSON.stringify({ section, establecimiento: est, fecha }),
+      credentials: 'include',
+    });
+    const d = await r.json();
+    if (!d.success) { alert(d.message || 'Error al crear sesión.'); return; }
+
+    SESSION.active  = true;
+    SESSION.code    = d.session_code;
+    SESSION.id      = d.session_id;
+    SESSION.section = d.section;
+    SESSION.isHost  = true;
+
+    document.getElementById('sm-code-out').textContent = d.session_code;
+    document.getElementById('sm-create-result').style.display = 'block';
+    updateCollabBar();
+    startPoll();
+  } catch(e) { alert('Error de red.'); }
+}
+
+/* ── Join session ── */
+async function joinSession() {
+  const code    = document.getElementById('sm-join-code').value.trim().toUpperCase();
+  const section = document.getElementById('sm-join-section').value;
+  if (code.length !== 6) { document.getElementById('sm-join-msg').textContent = 'Código debe tener 6 caracteres.'; return; }
+  try {
+    const r = await fetch(API_SESSION + '?action=join', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${TOKEN}` },
+      body: JSON.stringify({ session_code: code, section }),
+      credentials: 'include',
+    });
+    const d = await r.json();
+    const msgEl = document.getElementById('sm-join-msg');
+    if (!d.success) { msgEl.textContent = d.message || 'Error.'; msgEl.style.color = '#B83232'; return; }
+
+    SESSION.active  = true;
+    SESSION.code    = d.session_code;
+    SESSION.id      = d.session_id;
+    SESSION.section = d.section;
+    SESSION.isHost  = false;
+    SESSION.locks   = d.section_locks || {};
+
+    msgEl.textContent = `Unido. Evaluando: ${section}.`;
+    msgEl.style.color = '#A8D5B5';
+    updateCollabBar();
+    startPoll();
+    closeSessionModal();
+  } catch(e) { alert('Error de red.'); }
+}
+
+/* ── Poll session status every 6s ── */
+function startPoll() {
+  if (SESSION.pollTimer) clearInterval(SESSION.pollTimer);
+  SESSION.pollTimer = setInterval(pollSessionStatus, 6000);
+}
+
+async function pollSessionStatus() {
+  if (!SESSION.code) { renderStatusPane(null); return; }
+  try {
+    const r = await fetch(`${API_SESSION}?action=status&code=${SESSION.code}`, {
+      headers: { 'Authorization':`Bearer ${TOKEN}` },
+      credentials: 'include',
+    });
+    const d = await r.json();
+    if (!d.success) return;
+
+    SESSION.locks = d.section_locks || {};
+    updateCollabBar();
+    renderStatusPane(d);
+
+    if (d.status !== 'open' || d.is_expired) {
+      if (SESSION.pollTimer) clearInterval(SESSION.pollTimer);
+      SESSION.active = false;
+      updateCollabBar();
+    }
+  } catch(e) {}
+}
+
+function renderStatusPane(d) {
+  const el = document.getElementById('sm-status-content');
+  if (!d || !d.success) {
+    el.innerHTML = '<div style="color:#9A9890;font-size:12px;text-align:center;padding:16px">Sin sesión activa</div>';
+    return;
+  }
+  const locks = d.section_locks || {};
+  const sections = ['alimentos','salon','fotos'];
+  const pillsHtml = sections.map(sec => {
+    const lock = locks[sec];
+    if (!lock) return `<span class="sm-lock-pill available">${sec} · libre</span>`;
+    const mine = lock.operator_id === (typeof OPERATOR !== 'undefined' ? OPERATOR.id : '');
+    return `<span class="sm-lock-pill ${mine?'mine':'taken'}">${sec} · ${lock.operator_name}</span>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="font-size:10px;color:#9A9890;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Código</div>
+    <div style="font-size:24px;font-weight:900;color:#C4922A;letter-spacing:4px;font-family:monospace;margin-bottom:12px">${d.session_code}</div>
+    <div style="font-size:10px;color:#9A9890;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Secciones</div>
+    <div class="sm-section-lock">${pillsHtml}</div>
+    <div style="font-size:10px;color:#9A9890;margin-top:8px">Estado: <span style="color:${d.status==='open'?'#A8D5B5':'#B83232'}">${d.status.toUpperCase()}</span></div>
+    <div style="font-size:10px;color:#9A9890;margin-top:4px">Establecimiento: ${d.establecimiento||'—'}</div>
+  `;
+}
+
+/* ── Leave / release section ── */
+async function leaveSession() {
+  if (!SESSION.active || !SESSION.code) return;
+  if (!confirm('¿Abandonar sesión colaborativa?')) return;
+  try {
+    await fetch(API_SESSION + '?action=release', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${TOKEN}` },
+      body: JSON.stringify({ session_code: SESSION.code, section: SESSION.section }),
+      credentials: 'include',
+    });
+  } catch(e) {}
+  if (SESSION.pollTimer) clearInterval(SESSION.pollTimer);
+  SESSION = { active:false, code:null, id:null, section:null, isHost:false, locks:{}, pollTimer:null };
+  updateCollabBar();
+  closeSessionModal();
+}
+
+/* ── Update top collab bar ── */
+function updateCollabBar() {
+  const bar = document.getElementById('collab-bar');
+  if (!SESSION.active) { bar.classList.remove('active'); return; }
+  bar.classList.add('active');
+  document.getElementById('cb-code-display').textContent  = SESSION.code || '—';
+  document.getElementById('cb-section-display').textContent = SESSION.section || '—';
+  const peers = Object.values(SESSION.locks || {})
+    .filter(l => l.operator_id !== (typeof OPERATOR !== 'undefined' ? OPERATOR.id : ''))
+    .map(l => l.operator_name);
+  document.getElementById('cb-peers-display').textContent = peers.length ? peers.join(' · ') : '';
+}
+
+/* ── Set today as default date on modal open ── */
+document.addEventListener('DOMContentLoaded', () => {
+  const fd = document.getElementById('sm-create-fecha');
+  if (fd) fd.value = new Date().toISOString().split('T')[0];
+});
+</script>
 </body>
 </html>
+
