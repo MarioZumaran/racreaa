@@ -152,7 +152,7 @@ module.exports = async function handler(req, res) {
          gps_lat,gps_lng,gps_accuracy,client_ip,user_agent,
          session_token,request_id,client_submitted_at,server_timestamp,
          audit_type,mesa,mesero)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)
+      VALUES ($1,$2::uuid,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)
     `,[
       auditId, tenantId, operatorId,
       sanitize(body.establecimiento),
@@ -186,7 +186,7 @@ module.exports = async function handler(req, res) {
           (id,audit_id,tenant_id,item_num,nombre,categoria,score,nivel,observaciones,
            crit_presentacion,crit_temperatura,crit_sabor,crit_textura,crit_porcion,
            timer_start,timer_end,server_timestamp)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+        VALUES ($1,$2,$3::uuid,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
       `,[
         itemId, auditId, tenantId,
         item.num,
@@ -218,7 +218,7 @@ module.exports = async function handler(req, res) {
              image_data,mime_type,size_bytes,
              gps_lat,gps_lng,gps_verified,
              captured_at_client,server_timestamp,integrity_hash)
-          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+          VALUES ($1,$2,$3,$4::uuid,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
         `,[
           evId, auditId, itemId, tenantId, operatorId,
           ev.base64,                          // ← foto base64 guardada
