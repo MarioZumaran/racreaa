@@ -4,14 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#2C2A24">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="DMZ Audit">
-<meta http-equiv="X-Frame-Options" content="DENY">
-<link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/logo-dmz.jpg">
-<title>DMZ Audit · App</title>
+  <!-- ══ PWA iOS ══ -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DMZ Audit">
+  <meta name="format-detection" content="telephone=no">
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="/icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-120.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+  <!-- iOS Splash Screens -->
+  <link rel="apple-touch-startup-image" media="(device-width:320px) and (device-height:568px)" href="/icons/splash-640x1136.png">
+  <link rel="apple-touch-startup-image" media="(device-width:375px) and (device-height:667px)" href="/icons/splash-750x1334.png">
+  <link rel="apple-touch-startup-image" media="(device-width:375px) and (device-height:812px)" href="/icons/splash-1125x2436.png">
+  <link rel="apple-touch-startup-image" media="(device-width:414px) and (device-height:736px)" href="/icons/splash-1242x2208.png">
+  <link rel="apple-touch-startup-image" media="(device-width:414px) and (device-height:896px)" href="/icons/splash-828x1792.png">
+  <link rel="apple-touch-startup-image" media="(device-width:390px) and (device-height:844px)" href="/icons/splash-1170x2532.png">
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes"><meta http-equiv="X-Frame-Options" content="DENY"><title>DMZ Audit · App</title>
 
 <style>
 @font-face{
@@ -657,6 +670,84 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
   display: block;
 }
 @keyframes spin { to{transform:rotate(360deg)} }
+
+/* ══ BANNER INSTALACIÓN PWA ══ */
+.pwa-install-banner {
+  position: fixed;
+  bottom: calc(72px + var(--safe-bot) + 8px);
+  left: 12px; right: 12px;
+  background: var(--dark);
+  border: 1px solid var(--gold);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  animation: slide-up .3s ease;
+  border-radius: 4px;
+}
+@keyframes slide-up { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+.pwa-install-banner.hidden { display:none; }
+.pwa-icon { width:40px; height:40px; border-radius:8px; overflow:hidden; flex-shrink:0; }
+.pwa-icon img { width:100%; height:100%; object-fit:cover; }
+.pwa-text { flex:1; }
+.pwa-title { font-size:13px; font-weight:700; color:var(--text); line-height:1.2; }
+.pwa-sub { font-size:11px; color:var(--text3); margin-top:2px; }
+.pwa-btn {
+  background: var(--gold);
+  border: none;
+  color: var(--dark);
+  font-family: 'Morl', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  cursor: pointer;
+  border-radius: 2px;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+.pwa-close {
+  background: transparent;
+  border: none;
+  color: var(--text3);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Banner iOS instrucciones */
+.ios-install-guide {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 2px solid var(--gold);
+  padding: 20px 20px calc(20px + var(--safe-bot));
+  z-index: 600;
+  animation: slide-up .3s ease;
+  display: none;
+}
+.ios-install-guide.visible { display: block; }
+.ios-guide-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  margin-bottom: 16px; display:flex; align-items:center; justify-content:space-between;
+}
+.ios-steps { display:flex; flex-direction:column; gap:12px; }
+.ios-step { display:flex; align-items:center; gap:12px; }
+.ios-step-num {
+  width:24px; height:24px; border-radius:50%;
+  background:var(--gold); color:var(--dark);
+  font-size:11px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.ios-step-text { font-size:13px; color:var(--text2); line-height:1.4; }
+.ios-step-text strong { color:var(--text); }
+
 
 /* ══ PROTECCIÓN DE DATOS ══ */
 
@@ -1510,7 +1601,8 @@ async function submitFromSheet() {
         criterios:c.criterios, score:c._pct||0, nivel:c._nivel, observaciones:c.obs,
         timerStart: platilloTimers[c.id]?.start?.toISOString() || null,
         timerEnd:   platilloTimers[c.id]?.end?.toISOString()   || null,
-        evidence:(c.evidence||[]).map(e=>({id:e.id,base64:e.base64,mimeType:e.mimeType,sizeBytes:e.sizeBytes,capturedAt:e.capturedAt,gps:e.gps,gpsVerified:e.gpsVerified}))
+        evidence:(c.evidence||[]).map(e=>({id:e.id,base64:e.base64,mimeType:e.mimeType,sizeBytes:e.sizeBytes,
+          capturedAt:e.capturedAt||null,gps:e.gps||null,gpsVerified:e.gpsVerified||falseAt,gps:e.gps,gpsVerified:e.gpsVerified}))
       }))
     };
   } else {
@@ -1519,7 +1611,7 @@ async function submitFromSheet() {
     payload = {
       tipo:'salon', sessionToken:TOKEN, submittedAt:new Date().toISOString(), gpsAtSubmission:GPS,
       establecimiento: document.getElementById('s-est-m').value.trim(),
-      auditor:         '',
+      auditor:         auditor,
       fecha:           new Date().toISOString().split('T')[0],
       servicio:        document.getElementById('s-turno-m').value,
       auditorFirma: auditor, chefFirma: document.getElementById('sheet-fc').value.trim(),
@@ -1687,6 +1779,8 @@ function enviarReporteWA(payload, auditId, score) {
   try {
     const op      = OPERATOR || {};
     const nivel   = score >= 85 ? '🟢 EXCELENTE' : score >= 70 ? '🟡 BUENO' : score >= 55 ? '🟠 REGULAR' : score >= 40 ? '🔴 DEFICIENTE' : '🚨 CRÍTICO';
+    // Alerta especial si score < 60
+    const alertaScore = score < 60 ? '\n⚠️ *ALERTA: SCORE CRÍTICO — REQUIERE ATENCIÓN INMEDIATA*' : '';
     const tipo    = (payload.tipo || 'alimentos').toUpperCase();
     const items   = payload.items || [];
     const time    = new Date().toLocaleString('es-MX', {timeZone:'America/Mexico_City'});
@@ -1700,6 +1794,7 @@ function enviarReporteWA(payload, auditId, score) {
     const msg = [
       `📋 *EVALUACIÓN DMZ AUDIT*`,
       `${nivel} — ${score}/100`,
+      alertaScore,
       ``,
       `🏢 *${payload.establecimiento || '—'}*`,
       `👤 Auditor: ${op.full_name || payload.auditor || '—'}`,
@@ -1725,6 +1820,52 @@ function enviarReporteWA(payload, auditId, score) {
     console.warn('WA report error:', e);
   }
 }
+
+
+/* ══ AUTO-LOGOUT POR INACTIVIDAD (30 min) ══ */
+(function initAutoLogout() {
+  let timer;
+  const TIMEOUT = 30 * 60 * 1000; // 30 minutos
+
+  function resetTimer() {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      // Mostrar aviso antes de cerrar sesión
+      const div = document.createElement('div');
+      div.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+        background:#1A1917;border:2px solid var(--gold);padding:24px 28px;z-index:99999;
+        text-align:center;font-family:'Morl',sans-serif;border-radius:4px;
+        box-shadow:0 8px 32px rgba(0,0,0,.6);width:280px`;
+      div.innerHTML = `
+        <div style="font-size:10px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:12px">Sesión inactiva</div>
+        <div style="font-size:14px;color:rgba(250,250,247,.8);margin-bottom:16px">Tu sesión se cerrará por inactividad</div>
+        <button onclick="this.parentElement.remove();resetInactivityTimer();" style="
+          background:var(--gold);border:none;color:#2C2A24;padding:10px 24px;
+          font-family:'Morl',sans-serif;font-size:12px;font-weight:700;
+          letter-spacing:1px;cursor:pointer;border-radius:2px;width:100%">
+          CONTINUAR SESIÓN
+        </button>`;
+      document.body.appendChild(div);
+
+      // Si no responde en 60 segundos → logout automático
+      setTimeout(() => {
+        if (document.body.contains(div)) {
+          div.remove();
+          doLogout();
+        }
+      }, 60000);
+    }, TIMEOUT);
+  }
+
+  window.resetInactivityTimer = resetTimer;
+
+  // Eventos que reinician el timer
+  ['click','touchstart','keydown','scroll','mousemove'].forEach(ev =>
+    document.addEventListener(ev, resetTimer, { passive: true })
+  );
+
+  resetTimer();
+})();
 
 /* ── REPORTE DE ERROR POR WHATSAPP ── */
 let lastError = null;
@@ -2036,6 +2177,91 @@ loadHome();
   style.textContent = `@media print { body { display:none !important; } }`;
   document.head.appendChild(style);
 
+})();
+
+
+/* ══ PWA INSTALL LOGIC ══ */
+(function initPWAInstall() {
+  const isIOS     = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isAndroid = /android/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                    || window.navigator.standalone === true;
+
+  // Ya instalada — no mostrar
+  if (isStandalone) return;
+
+  // No mostrar si ya descartó
+  if (localStorage.getItem('pwa_dismissed') === '1') return;
+
+  let deferredPrompt = null;
+
+  // Android — capturar evento de instalación
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    showAndroidBanner();
+  });
+
+  function showAndroidBanner() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.classList.remove('hidden');
+  }
+
+  function showIOSGuide() {
+    const guide = document.getElementById('ios-install-guide');
+    if (guide) guide.classList.add('visible');
+  }
+
+  // iOS — mostrar guía después de 3 segundos si no está instalada
+  if (isIOS) {
+    setTimeout(showIOSGuide, 3000);
+  }
+
+  // Botón instalar Android
+  window.installPWA = async function() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      hideBanner();
+      if (window.DMZ_TRACK) DMZ_TRACK('pwa_installed', { action:'android_install' });
+    }
+    deferredPrompt = null;
+  };
+
+  window.dismissPWA = function() {
+    hideBanner();
+    localStorage.setItem('pwa_dismissed', '1');
+  };
+
+  window.closeIOSGuide = function() {
+    const guide = document.getElementById('ios-install-guide');
+    if (guide) guide.classList.remove('visible');
+    localStorage.setItem('pwa_dismissed', '1');
+  };
+
+  function hideBanner() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.classList.add('hidden');
+  }
+
+  // Registrar service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => {
+        reg.addEventListener('updatefound', () => {
+          const newSW = reg.installing;
+          newSW.addEventListener('statechange', () => {
+            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+              // Nueva versión disponible
+              newSW.postMessage('skipWaiting');
+              window.location.reload();
+            }
+          });
+        });
+      })
+      .catch(() => {});
+  }
 })();
 
 </script>

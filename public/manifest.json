@@ -1,16 +1,28 @@
 {
   "name": "DMZ Audit — Kitchen Support",
   "short_name": "DMZ Audit",
-  "description": "Plataforma de auditoría operativa De La Mora Zumarán",
+  "description": "Plataforma de auditoría operativa Mystery Shopper · De La Mora Zumarán Kitchen Support",
   "start_url": "/app.html",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#FAFAF7",
+  "background_color": "#2C2A24",
   "theme_color": "#2C2A24",
-  "icons": [
-    { "src": "/logo-dmz.jpg", "sizes": "192x192", "type": "image/jpeg", "purpose": "any maskable" },
-    { "src": "/logo-dmz.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any maskable" }
-  ],
+  "lang": "es",
   "categories": ["business", "productivity"],
-  "lang": "es"
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "/icons/icon-72.png",  "sizes": "72x72",   "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-120.png", "sizes": "120x120", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-152.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-167.png", "sizes": "167x167", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    { "src": "/icons/splash-750x1334.png", "sizes": "750x1334", "type": "image/png", "form_factor": "narrow" }
+  ]
 }
