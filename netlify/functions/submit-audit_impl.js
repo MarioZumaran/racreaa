@@ -215,13 +215,14 @@ module.exports = async function handler(req, res) {
         await client.query(`
           INSERT INTO racreaa.audit_evidence
             (id,audit_id,audit_item_id,tenant_id,operator_id,
-             image_data,mime_type,size_bytes,
+             blob_url,image_data,mime_type,size_bytes,
              gps_lat,gps_lng,gps_verified,
              captured_at_client,server_timestamp,integrity_hash)
-          VALUES ($1,$2,$3,$4::uuid,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+          VALUES ($1,$2,$3,$4::uuid,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
         `,[
           evId, auditId, itemId, tenantId, operatorId,
-          ev.base64,                          // ← foto base64 guardada
+          'base64_stored',                    // blob_url placeholder
+          ev.base64,                          // image_data — foto base64 completa
           ev.mimeType||'image/jpeg',
           ev.sizeBytes||0,
           ev.gps?.lat||null,
