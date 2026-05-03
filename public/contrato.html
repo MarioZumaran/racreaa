@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111010">
+<title>Contrato de Servicio · DMZ Audit</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --dark:#111010;--surface:#1A1917;--border:rgba(196,146,42,.12);--border2:rgba(255,255,255,.06);
+  --gold:#C4922A;--gold-lt:rgba(196,146,42,.08);--gold-dim:#8A6C1E;
+  --text:#FAFAF7;--text2:rgba(250,250,247,.55);--text3:rgba(250,250,247,.3);
+  --red:#B83232;--green:#2E7D52;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--dark);color:var(--text);line-height:1.7;overflow-x:hidden}
+a{color:var(--gold);text-decoration:none}a:hover{color:#E8B84A}
+::selection{background:var(--gold-dim);color:var(--text)}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:56px;background:rgba(17,16,16,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-badge{width:30px;height:30px;border-radius:6px;background:var(--gold-lt);border:1px solid var(--border);display:flex;align-items:center;justify-content:center}
+.nav-badge svg{width:16px;height:16px;stroke:var(--gold)}
+.nav-name{font-size:13px;font-weight:500;color:var(--text)}
+.nav-name small{font-size:9px;color:var(--gold);letter-spacing:2px;display:block;margin-top:1px;font-family:var(--mono)}
+.nav-back{font-size:12px;color:var(--text3);letter-spacing:1px;font-family:var(--mono);display:flex;align-items:center;gap:6px;transition:color .2s}
+.nav-back:hover{color:var(--text)}
+.doc-hero{padding:72px 40px 48px;max-width:880px;margin:0 auto;border-bottom:1px solid var(--border2)}
+.doc-tag{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:20px;border:1px solid rgba(196,146,42,.25);background:rgba(196,146,42,.06);font-size:10px;font-family:var(--mono);letter-spacing:2px;color:var(--gold);margin-bottom:20px}
+.doc-hero h1{font-size:clamp(26px,4vw,40px);font-weight:600;letter-spacing:-.5px;color:var(--text);margin-bottom:12px;line-height:1.2}
+.doc-hero p{font-size:15px;color:var(--text2);max-width:600px;line-height:1.6}
+.doc-meta{display:flex;gap:24px;margin-top:24px;flex-wrap:wrap}
+.doc-meta-item{font-size:11px;font-family:var(--mono);color:var(--text3)}
+.doc-meta-item strong{color:var(--gold);font-weight:500}
+.doc-layout{display:grid;grid-template-columns:220px 1fr;max-width:1100px;margin:0 auto;padding:48px 40px 80px;gap:48px}
+@media(max-width:768px){.doc-layout{grid-template-columns:1fr}.toc{display:none}}
+.toc{position:sticky;top:72px;height:fit-content}
+.toc-title{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;font-family:var(--mono)}
+.toc-list{list-style:none;display:flex;flex-direction:column;gap:2px}
+.toc-list a{font-size:12px;color:rgba(250,250,247,.35);padding:5px 0 5px 12px;border-left:2px solid transparent;display:block;transition:all .2s;line-height:1.3}
+.toc-list a:hover{color:var(--text);border-left-color:var(--gold-dim)}
+.toc-list a.active{color:var(--gold);border-left-color:var(--gold)}
+.doc-content{max-width:680px}
+.doc-section{margin-bottom:48px;scroll-margin-top:80px}
+.section-num{font-size:10px;font-family:var(--mono);color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+.doc-section h2{font-size:22px;font-weight:600;letter-spacing:-.3px;margin-bottom:16px;color:var(--text)}
+.doc-section h3{font-size:15px;font-weight:500;margin:20px 0 8px;color:var(--text)}
+.doc-section p{font-size:14px;color:var(--text2);margin-bottom:12px;line-height:1.75}
+.doc-section ul,.doc-section ol{padding-left:18px;margin-bottom:12px}
+.doc-section li{font-size:14px;color:var(--text2);margin-bottom:6px;line-height:1.65}
+.doc-section li strong{color:var(--text);font-weight:500}
+.data-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+.data-table th{text-align:left;padding:10px 14px;background:rgba(196,146,42,.06);border:1px solid var(--border);color:var(--gold);font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:500}
+.data-table td{padding:10px 14px;border:1px solid var(--border2);color:var(--text2);line-height:1.5}
+.data-table tr:hover td{background:rgba(255,255,255,.02)}
+.highlight-block{background:rgba(196,146,42,.06);border:1px solid var(--border);border-left:3px solid var(--gold);padding:16px 20px;margin:16px 0;border-radius:0 6px 6px 0}
+.highlight-block p{font-size:13px;color:var(--text2);margin:0;line-height:1.65}
+.highlight-block p strong{color:var(--text)}
+.warn-block{background:rgba(184,50,50,.05);border:1px solid rgba(184,50,50,.15);border-left:3px solid var(--red);padding:16px 20px;margin:16px 0;border-radius:0 6px 6px 0}
+.warn-block p{font-size:13px;color:rgba(224,85,85,.9);margin:0;line-height:1.65}
+.section-divider{height:1px;background:var(--border2);margin:48px 0}
+.dunning-table{width:100%;border-collapse:collapse;margin:16px 0}
+.dunning-table td{padding:12px 14px;border:1px solid var(--border2);font-size:13px;vertical-align:top}
+.dunning-table td:first-child{font-family:var(--mono);font-size:11px;color:var(--gold);white-space:nowrap;width:70px}
+.dunning-table tr:nth-child(4) td{border-left:2px solid var(--red);color:rgba(224,85,85,.9)}
+.sla-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+.sla-table th{text-align:left;padding:10px 14px;background:rgba(46,125,82,.06);border:1px solid var(--border);color:#4CAF82;font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:500}
+.sla-table td{padding:10px 14px;border:1px solid var(--border2);color:var(--text2)}
+footer{background:var(--surface);border-top:1px solid var(--border2);padding:32px 40px;text-align:center}
+footer p{font-size:11px;color:var(--text3);font-family:var(--mono)}
+footer strong{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+    <div class="nav-name">DMZ Audit <small>KITCHEN SUPPORT</small></div>
+  </div>
+  <a href="/login.html" class="nav-back">← Volver a la plataforma</a>
+</nav>
+
+<div class="doc-hero">
+  <div class="doc-tag">CONTRATO · TÉRMINOS DE SERVICIO</div>
+  <h1>Contrato de Prestación<br>de Servicios</h1>
+  <p>Términos y condiciones que rigen el uso de la plataforma DMZ Audit por parte de operadores, auditores y clientes de De La Mora Zumarán Kitchen Support.</p>
+  <div class="doc-meta">
+    <div class="doc-meta-item">Versión <strong>1.0</strong></div>
+    <div class="doc-meta-item">Vigente desde <strong>Mayo 2026</strong></div>
+    <div class="doc-meta-item">Jurisdicción <strong>México</strong></div>
+    <div class="doc-meta-item">Prestador <strong>DMZ Kitchen Support</strong></div>
+  </div>
+</div>
+
+<div class="doc-layout">
+  <aside class="toc">
+    <div class="toc-title">Cláusulas</div>
+    <ul class="toc-list">
+      <li><a href="#c1">I · Partes del contrato</a></li>
+      <li><a href="#c2">II · Objeto</a></li>
+      <li><a href="#c3">III · Alcance del servicio</a></li>
+      <li><a href="#c4">IV · Precio y pago</a></li>
+      <li><a href="#c5">V · Duración y renovación</a></li>
+      <li><a href="#c6">VI · Obligaciones del Prestador</a></li>
+      <li><a href="#c7">VII · Obligaciones del Cliente</a></li>
+      <li><a href="#c8">VIII · Confidencialidad</a></li>
+      <li><a href="#c9">IX · Propiedad intelectual</a></li>
+      <li><a href="#c10">X · Niveles de servicio (SLA)</a></li>
+      <li><a href="#c11">XI · Limitación de responsabilidad</a></li>
+      <li><a href="#c12">XII · Uso aceptable</a></li>
+      <li><a href="#c13">XIII · Terminación</a></li>
+      <li><a href="#c14">XIV · Ley aplicable</a></li>
+    </ul>
+  </aside>
+
+  <div class="doc-content">
+
+    <div class="doc-section" id="c1">
+      <div class="section-num">Cláusula I</div>
+      <h2>Partes del contrato</h2>
+      <p><strong>Prestador:</strong> De La Mora Zumarán Kitchen Support, persona física con actividad empresarial, con domicilio en Puebla, México, propietaria y operadora de la plataforma DMZ Audit (en adelante "el Prestador" o "DMZ").</p>
+      <p><strong>Cliente:</strong> La persona física o moral que contrata los servicios de auditoría operativa y accede a la plataforma DMZ Audit mediante credenciales autorizadas (en adelante "el Cliente").</p>
+      <p>Ambas partes reconocen capacidad legal suficiente para obligarse en los términos del presente Contrato.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c2">
+      <div class="section-num">Cláusula II</div>
+      <h2>Objeto</h2>
+      <p>El Prestador se obliga a proporcionar al Cliente acceso a la plataforma <strong>DMZ Audit</strong> — sistema web de auditoría operativa para la industria de alimentos y bebidas — incluyendo sus módulos de evaluación de alimentos, evaluación de servicio de salón, evidencia fotográfica con GPS, historial de evaluaciones y panel de monitoreo.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c3">
+      <div class="section-num">Cláusula III</div>
+      <h2>Alcance del servicio</h2>
+      <p>El servicio incluye acceso a los siguientes módulos:</p>
+      <ul>
+        <li>Evaluación de alimentos: calificación por criterios (presentación, temperatura, sabor, textura, porción)</li>
+        <li>Evaluación de servicio de salón: saludo, secuencia, conocimiento de menú, cliente redondo, venta sugestiva</li>
+        <li>Captura de evidencia fotográfica con sello GPS incorruptible</li>
+        <li>Timer de servicio y registro de tiempos por platillo</li>
+        <li>Firma digital del auditor y del responsable del establecimiento</li>
+        <li>Historial permanente de evaluaciones con trazabilidad total</li>
+        <li>Panel de administración y monitoreo de sesiones en tiempo real</li>
+        <li>Reportes automáticos vía WhatsApp y correo electrónico</li>
+        <li>Audit trail inmutable — ningún registro puede ser modificado retroactivamente</li>
+        <li>Soporte técnico por WhatsApp (+52 222 362 3135)</li>
+      </ul>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c4">
+      <div class="section-num">Cláusula IV</div>
+      <h2>Precio y forma de pago</h2>
+      <p>Los precios y condiciones comerciales se establecen individualmente en la propuesta de servicio correspondiente a cada Cliente. Las condiciones generales son:</p>
+      <ul>
+        <li>Los precios se expresan en pesos mexicanos (MXN) más IVA cuando aplique</li>
+        <li>El invoice se envía automáticamente al correo registrado</li>
+        <li>El Prestador se reserva el derecho de actualizar precios con 30 días de anticipación</li>
+      </ul>
+
+      <h3>Política de impago</h3>
+      <table class="dunning-table">
+        <tr><td>Día 1</td><td style="color:var(--text2)">Cobro procesado. Invoice enviado al correo registrado.</td></tr>
+        <tr><td>Día 3</td><td style="color:var(--text2)">Recordatorio de pago vía WhatsApp si no se procesó.</td></tr>
+        <tr><td>Día 5</td><td style="color:var(--text2)">Aviso final — "El acceso se pausará mañana."</td></tr>
+        <tr><td>Día 6</td><td>Acceso bloqueado. Datos preservados pero inaccesibles.</td></tr>
+        <tr><td>Día 30</td><td style="color:var(--text2)">Cancelación definitiva. Datos conservados 60 días adicionales.</td></tr>
+      </table>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c5">
+      <div class="section-num">Cláusula V</div>
+      <h2>Duración y renovación</h2>
+      <p>El presente Contrato tiene la vigencia acordada en la propuesta comercial y se renueva automáticamente según las condiciones pactadas.</p>
+      <p>Cualquiera de las partes puede dar por terminado el Contrato con <strong>15 días naturales de anticipación</strong>, notificando por escrito al correo electrónico de la contraparte. La terminación no genera derecho a reembolso del período en curso.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c6">
+      <div class="section-num">Cláusula VI</div>
+      <h2>Obligaciones del Prestador</h2>
+      <ul>
+        <li>Mantener la plataforma disponible según los SLA establecidos en la Cláusula X</li>
+        <li>Implementar las medidas de seguridad descritas en la Política de Privacidad</li>
+        <li>Realizar respaldos automáticos de la información del Cliente</li>
+        <li>Notificar al Cliente con al menos 24 horas de anticipación ante mantenimientos programados</li>
+        <li>Responder solicitudes de soporte en un máximo de 24 horas hábiles</li>
+        <li>Mantener estricta confidencialidad de toda la información del Cliente</li>
+        <li>Notificar de inmediato cualquier incidente de seguridad que afecte datos del Cliente</li>
+        <li>Preservar la integridad del audit trail — ningún registro puede ser modificado</li>
+      </ul>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c7">
+      <div class="section-num">Cláusula VII</div>
+      <h2>Obligaciones del Cliente</h2>
+      <ul>
+        <li>Pagar puntualmente según las condiciones acordadas</li>
+        <li>Mantener confidenciales sus credenciales de acceso y no compartirlas con personas no autorizadas</li>
+        <li>Utilizar la plataforma exclusivamente para los fines operativos del negocio</li>
+        <li>No intentar acceder a datos de otros clientes ni a partes no autorizadas</li>
+        <li>Reportar de inmediato al Prestador cualquier uso no autorizado o incidente de seguridad</li>
+        <li>No reproducir, copiar ni distribuir la plataforma ni sus componentes</li>
+        <li>Garantizar que los auditores autorizados conocen y aceptan esta política</li>
+        <li>No intentar manipular, alterar o falsificar evaluaciones o evidencias</li>
+      </ul>
+
+      <div class="warn-block">
+        <p>La falsificación de evaluaciones, manipulación de evidencias o acceso no autorizado son causas de terminación inmediata del contrato y pueden derivar en acciones legales.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c8">
+      <div class="section-num">Cláusula VIII</div>
+      <h2>Confidencialidad</h2>
+      <p>Ambas partes se obligan a mantener estricta confidencialidad respecto a:</p>
+      <ul>
+        <li>Información operativa, estándares de servicio y datos de evaluación del Cliente</li>
+        <li>Datos del personal evaluado y estructura organizacional del Cliente</li>
+        <li>Resultados de auditorías, calificaciones y reportes generados</li>
+        <li>Tecnología, algoritmos y código fuente de la plataforma del Prestador</li>
+        <li>Términos comerciales y condiciones particulares pactadas</li>
+      </ul>
+      <p>Esta obligación tiene vigencia durante la relación contractual y por un período adicional de <strong>5 años</strong> después de su terminación.</p>
+
+      <div class="highlight-block">
+        <p>Los auditores autorizados están sujetos a un <strong>acuerdo de no divulgación (NDA) implícito</strong> al aceptar estos términos. La identidad del cliente contratante y los resultados de las evaluaciones son información confidencial y no pueden ser compartidos con terceros bajo ninguna circunstancia.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c9">
+      <div class="section-num">Cláusula IX</div>
+      <h2>Propiedad intelectual</h2>
+      <h3>Propiedad del Prestador</h3>
+      <p>La plataforma DMZ Audit, incluyendo código fuente, diseño, arquitectura, algoritmos, interfaces y documentación, es propiedad exclusiva del Prestador y está protegida por las leyes de propiedad intelectual mexicanas.</p>
+      <h3>Propiedad del Cliente</h3>
+      <p>Todos los datos operativos ingresados por el Cliente — incluyendo evaluaciones, fotografías, dictámenes y registros — son y seguirán siendo <strong>propiedad exclusiva del Cliente</strong>. El Prestador no adquiere ningún derecho sobre dichos datos.</p>
+      <h3>Licencia de uso</h3>
+      <p>El Prestador otorga al Cliente una licencia de uso <strong>no exclusiva, no transferible y temporal</strong>, vigente únicamente durante la relación contractual activa.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c10">
+      <div class="section-num">Cláusula X</div>
+      <h2>Niveles de servicio (SLA)</h2>
+      <table class="sla-table">
+        <thead><tr><th>Métrica</th><th>Compromiso</th></tr></thead>
+        <tbody>
+          <tr><td>Disponibilidad mensual</td><td>99% (excluye mantenimientos programados)</td></tr>
+          <tr><td>Tiempo de respuesta soporte</td><td>Máximo 24 horas hábiles</td></tr>
+          <tr><td>Tiempo resolución incidente crítico</td><td>Máximo 4 horas hábiles</td></tr>
+          <tr><td>Notificación mantenimiento</td><td>Mínimo 24 horas antes</td></tr>
+          <tr><td>Ventana de mantenimiento</td><td>Domingos 02:00–06:00 hrs</td></tr>
+          <tr><td>Recuperación ante desastre (RTO)</td><td>4 horas hábiles</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c11">
+      <div class="section-num">Cláusula XI</div>
+      <h2>Limitación de responsabilidad</h2>
+      <p>El Prestador no será responsable por:</p>
+      <ul>
+        <li>Pérdidas indirectas, incidentales o consecuentes derivadas del uso de la plataforma</li>
+        <li>Interrupciones causadas por fuerza mayor, fallas en servicios de terceros o problemas de conectividad del Cliente</li>
+        <li>Decisiones operativas tomadas basándose en los resultados de la plataforma</li>
+        <li>Uso no autorizado de las credenciales del Cliente por terceros</li>
+      </ul>
+      <p>La responsabilidad máxima del Prestador en cualquier caso no excederá el valor del servicio contratado en el período afectado.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c12">
+      <div class="section-num">Cláusula XII</div>
+      <h2>Uso aceptable</h2>
+      <p>El Cliente se compromete a <strong>no</strong> utilizar la plataforma para:</p>
+      <ul>
+        <li>Actividades ilegales o contrarias a las buenas costumbres</li>
+        <li>Hostigamiento, difamación o daño a la reputación de terceros</li>
+        <li>Intentos de acceso no autorizado o ingeniería inversa</li>
+        <li>Sobrecarga intencional de los servidores (DDoS)</li>
+        <li>Compartir credenciales de acceso con personas no autorizadas</li>
+        <li>Falsificar evaluaciones, evidencias fotográficas o firmas digitales</li>
+      </ul>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c13">
+      <div class="section-num">Cláusula XIII</div>
+      <h2>Terminación</h2>
+      <p>El Prestador puede terminar el Contrato de forma inmediata y sin responsabilidad en caso de:</p>
+      <ul>
+        <li>Incumplimiento grave de las obligaciones del Cliente</li>
+        <li>Impago por más de 6 días naturales</li>
+        <li>Violación a la cláusula de uso aceptable</li>
+        <li>Violación a la cláusula de confidencialidad</li>
+        <li>Intento de acceso no autorizado o manipulación de datos</li>
+      </ul>
+      <p>En caso de terminación, el Cliente tiene 30 días para solicitar exportación de sus datos. Transcurrido ese plazo, los datos serán eliminados de forma definitiva.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="c14">
+      <div class="section-num">Cláusula XIV</div>
+      <h2>Ley aplicable y jurisdicción</h2>
+      <p>El presente Contrato se rige por las leyes de los <strong>Estados Unidos Mexicanos</strong>. Para cualquier controversia derivada de su interpretación o cumplimiento, las partes se someten a la jurisdicción de los tribunales competentes de la ciudad de <strong>Puebla, Puebla</strong>, renunciando a cualquier otro fuero que pudiera corresponderles.</p>
+      <p>Este Contrato, junto con la <a href="/privacidad.html">Política de Privacidad</a>, constituye el acuerdo completo entre las partes respecto al objeto aquí descrito.</p>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 <strong>De La Mora Zumarán Kitchen Support</strong> · DMZ Audit · Puebla, México</p>
+  <p style="margin-top:6px">Versión 1.0 · Mayo 2026 · <a href="/privacidad.html">Política de Privacidad</a></p>
+</footer>
+
+<script>
+const sections = document.querySelectorAll('.doc-section');
+const links    = document.querySelectorAll('.toc-list a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+  links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + current));
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111010">
+<title>Política de Privacidad · DMZ Audit</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --dark:#111010;
+  --surface:#1A1917;
+  --border:rgba(196,146,42,.12);
+  --border2:rgba(255,255,255,.06);
+  --gold:#C4922A;
+  --gold-lt:rgba(196,146,42,.08);
+  --gold-dim:#8A6C1E;
+  --text:#FAFAF7;
+  --text2:rgba(250,250,247,.55);
+  --text3:rgba(250,250,247,.3);
+  --red:#B83232;
+  --green:#2E7D52;
+  --font:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--dark);color:var(--text);line-height:1.7;overflow-x:hidden}
+a{color:var(--gold);text-decoration:none}
+a:hover{color:#E8B84A}
+::selection{background:var(--gold-dim);color:var(--text)}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:56px;background:rgba(17,16,16,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-badge{width:30px;height:30px;border-radius:6px;background:var(--gold-lt);border:1px solid var(--border);display:flex;align-items:center;justify-content:center}
+.nav-badge svg{width:16px;height:16px;stroke:var(--gold)}
+.nav-name{font-size:13px;font-weight:500;color:var(--text)}
+.nav-name small{font-size:9px;color:var(--gold);letter-spacing:2px;display:block;margin-top:1px;font-family:var(--mono)}
+.nav-back{font-size:12px;color:var(--text3);letter-spacing:1px;font-family:var(--mono);display:flex;align-items:center;gap:6px;transition:color .2s}
+.nav-back:hover{color:var(--text)}
+
+/* HERO */
+.doc-hero{padding:72px 40px 48px;max-width:880px;margin:0 auto;border-bottom:1px solid var(--border2)}
+.doc-tag{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:20px;border:1px solid rgba(46,125,82,.25);background:rgba(46,125,82,.06);font-size:10px;font-family:var(--mono);letter-spacing:2px;color:#4CAF82;margin-bottom:20px}
+.doc-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:#4CAF82;animation:pulse-g 2s infinite}
+@keyframes pulse-g{0%,100%{opacity:1}50%{opacity:.3}}
+.doc-hero h1{font-size:clamp(26px,4vw,40px);font-weight:600;letter-spacing:-.5px;color:var(--text);margin-bottom:12px;line-height:1.2}
+.doc-hero p{font-size:15px;color:var(--text2);max-width:600px;line-height:1.6}
+.doc-meta{display:flex;gap:24px;margin-top:24px;flex-wrap:wrap}
+.doc-meta-item{font-size:11px;font-family:var(--mono);color:var(--text3)}
+.doc-meta-item strong{color:var(--gold);font-weight:500}
+
+/* LAYOUT */
+.doc-layout{display:grid;grid-template-columns:220px 1fr;max-width:1100px;margin:0 auto;padding:48px 40px 80px;gap:48px}
+@media(max-width:768px){.doc-layout{grid-template-columns:1fr}.toc{display:none}}
+
+/* TOC */
+.toc{position:sticky;top:72px;height:fit-content}
+.toc-title{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;font-family:var(--mono)}
+.toc-list{list-style:none;display:flex;flex-direction:column;gap:2px}
+.toc-list a{font-size:12px;color:rgba(250,250,247,.35);padding:5px 0 5px 12px;border-left:2px solid transparent;display:block;transition:all .2s;line-height:1.3}
+.toc-list a:hover{color:var(--text);border-left-color:var(--gold-dim)}
+.toc-list a.active{color:var(--gold);border-left-color:var(--gold)}
+
+/* CONTENT */
+.doc-content{max-width:680px}
+.doc-section{margin-bottom:48px;scroll-margin-top:80px}
+.section-num{font-size:10px;font-family:var(--mono);color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+.doc-section h2{font-size:22px;font-weight:600;letter-spacing:-.3px;margin-bottom:16px;color:var(--text)}
+.doc-section h3{font-size:15px;font-weight:500;margin:20px 0 8px;color:var(--text)}
+.doc-section p{font-size:14px;color:var(--text2);margin-bottom:12px;line-height:1.75}
+.doc-section ul,.doc-section ol{padding-left:18px;margin-bottom:12px}
+.doc-section li{font-size:14px;color:var(--text2);margin-bottom:6px;line-height:1.65}
+.doc-section li strong{color:var(--text);font-weight:500}
+
+/* CARDS */
+.security-card{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden}
+.security-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent)}
+.sc-badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:4px;font-size:9px;font-family:var(--mono);letter-spacing:2px;margin-bottom:10px}
+.sc-badge.gold{background:rgba(196,146,42,.1);border:1px solid rgba(196,146,42,.2);color:var(--gold)}
+.sc-badge.green{background:rgba(46,125,82,.1);border:1px solid rgba(46,125,82,.2);color:#4CAF82}
+.sc-badge.red{background:rgba(184,50,50,.1);border:1px solid rgba(184,50,50,.2);color:#E05555}
+.security-card h3{font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px}
+.security-card p{font-size:13px;color:var(--text2);line-height:1.65;margin:0}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+.data-table th{text-align:left;padding:10px 14px;background:rgba(196,146,42,.06);border:1px solid var(--border);color:var(--gold);font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:500}
+.data-table td{padding:10px 14px;border:1px solid var(--border2);color:var(--text2);line-height:1.5}
+.data-table tr:hover td{background:rgba(255,255,255,.02)}
+
+/* HIGHLIGHT */
+.highlight-block{background:rgba(196,146,42,.06);border:1px solid var(--border);border-left:3px solid var(--gold);padding:16px 20px;margin:16px 0;border-radius:0 6px 6px 0}
+.highlight-block p{font-size:13px;color:var(--text2);margin:0;line-height:1.65}
+.highlight-block p strong{color:var(--text)}
+.warn-block{background:rgba(184,50,50,.05);border:1px solid rgba(184,50,50,.15);border-left:3px solid var(--red);padding:16px 20px;margin:16px 0;border-radius:0 6px 6px 0}
+.warn-block p{font-size:13px;color:rgba(224,85,85,.9);margin:0;line-height:1.65}
+
+/* DIVIDER */
+.section-divider{height:1px;background:var(--border2);margin:48px 0}
+
+/* FOOTER */
+footer{background:var(--surface);border-top:1px solid var(--border2);padding:32px 40px;text-align:center}
+footer p{font-size:11px;color:var(--text3);font-family:var(--mono)}
+footer strong{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <div class="nav-name">
+      DMZ Audit
+      <small>KITCHEN SUPPORT</small>
+    </div>
+  </div>
+  <a href="/login.html" class="nav-back">← Volver a la plataforma</a>
+</nav>
+
+<div class="doc-hero">
+  <div class="doc-tag">PRIVACIDAD &amp; CONFIDENCIALIDAD</div>
+  <h1>Política de Privacidad<br>y Protección de Datos</h1>
+  <p>Cómo De La Mora Zumarán Kitchen Support recopila, protege y gestiona la información operativa y personal en la plataforma DMZ Audit.</p>
+  <div class="doc-meta">
+    <div class="doc-meta-item">Versión <strong>1.0</strong></div>
+    <div class="doc-meta-item">Vigente desde <strong>Mayo 2026</strong></div>
+    <div class="doc-meta-item">Jurisdicción <strong>México · LFPDPPP</strong></div>
+    <div class="doc-meta-item">Responsable <strong>DMZ Kitchen Support</strong></div>
+  </div>
+</div>
+
+<div class="doc-layout">
+  <aside class="toc">
+    <div class="toc-title">Contenido</div>
+    <ul class="toc-list">
+      <li><a href="#s1">01 · Responsable del tratamiento</a></li>
+      <li><a href="#s2">02 · Datos recopilados</a></li>
+      <li><a href="#s3">03 · Finalidad del tratamiento</a></li>
+      <li><a href="#s4">04 · Infraestructura y almacenamiento</a></li>
+      <li><a href="#s5">05 · Confidencialidad operativa</a></li>
+      <li><a href="#s6">06 · Seguridad técnica</a></li>
+      <li><a href="#s7">07 · Evidencia fotográfica y GPS</a></li>
+      <li><a href="#s8">08 · Transferencia a terceros</a></li>
+      <li><a href="#s9">09 · Respaldo de información</a></li>
+      <li><a href="#s10">10 · Derechos ARCO</a></li>
+      <li><a href="#s11">11 · Retención y eliminación</a></li>
+      <li><a href="#s12">12 · Contacto</a></li>
+    </ul>
+  </aside>
+
+  <div class="doc-content">
+
+    <div class="doc-section" id="s1">
+      <div class="section-num">01</div>
+      <h2>Responsable del tratamiento</h2>
+      <p>El responsable del tratamiento de datos personales es <strong>De La Mora Zumarán Kitchen Support</strong> (en adelante "DMZ" o "el Prestador"), con domicilio en Puebla, México, y contacto en <strong>mario@delamorazumaran.com</strong>.</p>
+      <p>La plataforma <strong>DMZ Audit</strong> es operada exclusivamente por DMZ Kitchen Support como herramienta de auditoría operativa para la industria de alimentos y bebidas.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="s2">
+      <div class="section-num">02</div>
+      <h2>Datos que recopilamos</h2>
+
+      <h3>Datos de identidad del operador</h3>
+      <ul>
+        <li>Nombre completo del auditor o evaluador</li>
+        <li>Correo electrónico (identificador único de acceso)</li>
+        <li>Credenciales de acceso encriptadas (contraseña con hash bcrypt-12)</li>
+        <li>Rol asignado en la plataforma (admin / auditor)</li>
+      </ul>
+
+      <h3>Datos operativos generados en la plataforma</h3>
+      <ul>
+        <li>Evaluaciones de alimentos: platillos, categorías, calificaciones por criterio</li>
+        <li>Evaluaciones de servicio de salón: criterios F&B, tiempos de servicio</li>
+        <li>Fotografías de evidencia con sello GPS y metadatos de captura</li>
+        <li>Coordenadas GPS en el momento de la captura y envío</li>
+        <li>Tiempos de servicio (hora inicio, hora fin, duración por platillo)</li>
+        <li>Dictámenes, observaciones y firmas digitales del auditor</li>
+      </ul>
+
+      <h3>Datos técnicos de sesión</h3>
+      <ul>
+        <li>Dirección IP del dispositivo</li>
+        <li>User-agent (tipo de navegador/dispositivo)</li>
+        <li>Timestamp de inicio y cierre de sesión</li>
+        <li>Eventos de navegación dentro de la app (anonimizados)</li>
+      </ul>
+
+      <div class="highlight-block">
+        <p><strong>No recopilamos:</strong> números de tarjeta bancaria, documentos de identidad oficiales, datos biométricos, ni información de menores de edad.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="s3">
+      <div class="section-num">03</div>
+      <h2>Finalidad del tratamiento</h2>
+      <table class="data-table">
+        <thead>
+          <tr><th>Dato</th><th>Finalidad</th><th>Base legal</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Correo y nombre</td><td>Autenticación, notificaciones de sistema</td><td>Ejecución de contrato</td></tr>
+          <tr><td>Evaluaciones operativas</td><td>Trazabilidad, auditoría, control de calidad</td><td>Interés legítimo / contrato</td></tr>
+          <tr><td>Fotografías GPS</td><td>Evidencia incorruptible de evaluación</td><td>Consentimiento explícito</td></tr>
+          <tr><td>IP y dispositivo</td><td>Seguridad, detección de acceso no autorizado</td><td>Interés legítimo</td></tr>
+          <tr><td>Tiempos de servicio</td><td>Métricas operativas y benchmarking interno</td><td>Contrato</td></tr>
+        </tbody>
+      </table>
+      <div class="highlight-block">
+        <p><strong>Los datos operativos no se utilizan para fines comerciales, de marketing ni análisis de terceros.</strong> Su única finalidad es el control de calidad y auditoría operativa del Cliente.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="s4">
+      <div class="section-num">04</div>
+      <h2>Infraestructura y almacenamiento</h2>
+
+      <div class="security-card">
+        <div class="sc-badge gold">FRONTEND</div>
+        <h3>GitHub Pages — dmzkitchensupport.github.io</h3>
+        <p>Sitio web estático hospedado en servidores de GitHub Inc. (Estados Unidos). No se almacenan datos sensibles en el frontend.</p>
+      </div>
+
+      <div class="security-card">
+        <div class="sc-badge green">BASE DE DATOS</div>
+        <h3>Neon PostgreSQL — región us-east-1</h3>
+        <p>Base de datos PostgreSQL con cifrado en tránsito (TLS 1.3) y en reposo (AES-256). Row Level Security (RLS) activo. Particionamiento multi-tenant que aísla completamente los datos de cada cliente.</p>
+      </div>
+
+      <div class="security-card">
+        <div class="sc-badge gold">API</div>
+        <h3>Netlify Functions — dmz-audit.netlify.app</h3>
+        <p>Funciones serverless para procesamiento de autenticación y datos. HTTPS forzado con HSTS. Rate limiting via Upstash Redis. Credenciales de acceso nunca expuestas en el frontend.</p>
+      </div>
+
+      <div class="security-card">
+        <div class="sc-badge green">EMAIL</div>
+        <h3>Resend — notificaciones transaccionales</h3>
+        <p>Envío de reportes de evaluación al administrador. No se utiliza para marketing ni comunicaciones no solicitadas.</p>
+      </div>
+
+      <h3>Transferencia internacional</h3>
+      <p>Al utilizar la plataforma, el Cliente acepta que sus datos operativos sean almacenados en servidores ubicados en Estados Unidos, bajo los términos de privacidad de GitHub, Neon y Netlify, los cuales cumplen con estándares equivalentes a la normativa mexicana aplicable.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="s5">
+      <div class="section-num">05</div>
+      <h2>Confidencialidad operativa</h2>
+      <p>DMZ Kitchen Support reconoce que toda la información operativa del Cliente — incluyendo nombres de establecimientos, procesos, estándares de servicio, calificaciones y datos del personal evaluado — constituye <strong>información confidencial y propiedad exclusiva del Cliente</strong>.</p>
+
+      <h3>Compromisos del Prestador</h3>
+      <ul>
+        <li>No divulgar, reproducir ni compartir información operativa del Cliente con terceros bajo ninguna circunstancia</li>
+        <li>No utilizar datos del Cliente para desarrollar productos, servicios o análisis para terceros</li>
+        <li>El personal con acceso a la plataforma está sujeto a acuerdos de confidencialidad internos</li>
+        <li>Los datos de cada cliente están aislados a nivel de base de datos y no se mezclan con datos de otros clientes</li>
+        <li>Las evaluaciones y fotografías son accesibles exclusivamente por el administrador autorizado del cliente</li>
+      </ul>
+
+      <h3>Propiedad de los datos</h3>
+      <p>El Cliente es el <strong>propietario absoluto</strong> de todos los datos operativos generados en la plataforma. DMZ actúa como procesador de datos, no como titular. En caso de terminación del servicio, el Cliente puede solicitar la exportación completa de sus datos en formato JSON/CSV dentro de los 30 días siguientes.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="s6">
+      <div class="section-num">06</div>
+      <h2>Seguridad técnica</h2>
+
+      <div class="security-card">
+        <div class="sc-badge green">ZERO-TRUST PROTOCOL</div>
+        <h3>Autenticación y control de acceso</h3>
+        <p>JWT HS256 con expiración de 15 minutos. Refresh Token Rotation — la reutilización de un token revoca automáticamente todas las sesiones activas. Contraseñas con hash bcrypt cost-12. Rate limiting: máximo 5 intentos fallidos por 15 minutos por IP.</p>
+      </div>
+
+      <div class="security-card">
+        <div class="sc-badge gold">AUDIT TRAIL INMUTABLE</div>
+        <h3>Trazabilidad permanente</h3>
+        <p>Cada acción genera una huella digital inalterable: quién, qué, cuándo y desde dónde. Los registros de <code>audit_logs</code> están protegidos por triggers de base de datos que bloquean UPDATE y DELETE. Ningún usuario, incluyendo administradores, puede modificar o eliminar el historial de auditoría.</p>
+      </div>
+
+      <div class="security-card">
+        <div class="sc-badge gold">MULTI-TENANT</div>
+        <h3>Aislamiento de datos</h3>
+        <p>Arquitectura multi-tenant con Row Level Security (RLS) en PostgreSQL. Cada tenant opera en su propio espacio lógico aislado. Es técnicamente imposible que un cliente acceda a datos de otro cliente.</p>
+      </div>
+
+      <h3>Cifrado y transporte</h3>
+      <ul>
+        <li>TLS 1.3 en todas las conexiones cliente-servidor</li>
+        <li>HSTS activo — el navegador nunca permite conexiones sin HTTPS</li>
+        <li>AES-256 para datos en reposo en la base de datos</li>
+        <li>Headers de seguridad: X-Frame-Options: DENY, X-Content-Type-Options: nosniff</li>
+      </ul>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="s7">
+      <div class="section-num">07</div>
+      <h2>Evidencia fotográfica y GPS</h2>
+
+      <div class="highlight-block">
+        <p>Las fotografías capturadas en la plataforma son <strong>evidencia incorruptible</strong>. Cada foto incluye: coordenadas GPS verificadas, timestamp del servidor, identificador del operador y hash de integridad SHA-256.</p>
+      </div>
+
+      <h3>Cómo se captura la evidencia</h3>
+      <ul>
+        <li>Las fotos solo pueden capturarse directamente desde la cámara del dispositivo (capture="environment"). No se pueden adjuntar imágenes de galería.</li>
+        <li>Las coordenadas GPS se registran en el momento exacto de la captura</li>
+        <li>La foto, el GPS y el timestamp del servidor se vinculan mediante hash criptográfico</li>
+        <li>No es posible alterar retroactivamente ninguno de estos datos</li>
+      </ul>
+
+      <h3>Almacenamiento de fotografías</h3>
+      <p>Las imágenes se almacenan en formato base64 en la base de datos PostgreSQL, vinculadas al registro de auditoría correspondiente. No se comparten con terceros ni se utilizan para ningún fin distinto al control de calidad operativo.</p>
+
+      <div class="warn-block">
+        <p>Las fotografías contienen metadatos de geolocalización. El auditor consiente expresamente la captura de su ubicación al momento de tomar evidencia fotográfica dentro de la plataforma.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="s8">
+      <div class="section-num">08</div>
+      <h2>Transferencia de datos a terceros</h2>
+      <p>DMZ Kitchen Support <strong>no vende, arrienda ni transfiere</strong> datos personales u operativos del Cliente a terceros, excepto en los siguientes casos estrictamente necesarios:</p>
+      <table class="data-table">
+        <thead>
+          <tr><th>Proveedor</th><th>Datos compartidos</th><th>Propósito</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Neon Inc.</td><td>Datos operativos (subprocesador)</td><td>Hospedaje de base de datos</td></tr>
+          <tr><td>Netlify Inc.</td><td>Logs de acceso mínimos</td><td>Hospedaje de funciones API</td></tr>
+          <tr><td>GitHub Inc.</td><td>Ningún dato sensible</td><td>Hospedaje del sitio estático</td></tr>
+          <tr><td>Resend Inc.</td><td>Correo del administrador</td><td>Envío de reportes de evaluación</td></tr>
+          <tr><td>Autoridades</td><td>Solo ante requerimiento legal formal</td><td>Cumplimiento legal</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="s9">
+      <div class="section-num">09</div>
+      <h2>Respaldo de información</h2>
+      <table class="data-table">
+        <thead>
+          <tr><th>Métrica</th><th>Compromiso</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Respaldo automático</td><td>Diario (gestionado por Neon PostgreSQL)</td></tr>
+          <tr><td>Retención</td><td>Últimos 7 días automáticos</td></tr>
+          <tr><td>Cifrado del respaldo</td><td>AES-256</td></tr>
+          <tr><td>Punto de recuperación (RPO)</td><td>Máximo 24 horas</td></tr>
+          <tr><td>Tiempo de recuperación (RTO)</td><td>Máximo 4 horas hábiles</td></tr>
+          <tr><td>Exportación a solicitud</td><td>JSON / CSV en 30 días</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="s10">
+      <div class="section-num">10</div>
+      <h2>Derechos ARCO</h2>
+      <p>De conformidad con la <strong>Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP)</strong>, el titular de los datos tiene los siguientes derechos:</p>
+      <ul>
+        <li><strong>Acceso:</strong> Conocer qué datos personales suyos están en posesión del Prestador</li>
+        <li><strong>Rectificación:</strong> Corregir datos inexactos o incompletos</li>
+        <li><strong>Cancelación:</strong> Solicitar la eliminación de sus datos del sistema</li>
+        <li><strong>Oposición:</strong> Oponerse al tratamiento de sus datos para finalidades específicas</li>
+      </ul>
+      <p>Para ejercer cualquiera de estos derechos, envíe su solicitud a <strong>mario@delamorazumaran.com</strong> con el asunto "Derechos ARCO" y su identificación. El tiempo de respuesta es de máximo <strong>20 días hábiles</strong>.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="s11">
+      <div class="section-num">11</div>
+      <h2>Retención y eliminación de datos</h2>
+      <ul>
+        <li>Los datos operativos se conservan durante la vigencia del servicio</li>
+        <li>Al terminar el servicio, los datos se conservan 60 días adicionales para exportación</li>
+        <li>Tras 60 días post-cancelación, los datos son eliminados de forma segura e irrecuperable</li>
+        <li>Los registros de audit_logs se conservan por obligación de trazabilidad durante 5 años</li>
+        <li>Los logs de sesión técnicos se eliminan automáticamente después de 90 días</li>
+      </ul>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="doc-section" id="s12">
+      <div class="section-num">12</div>
+      <h2>Contacto y actualizaciones</h2>
+      <p>Para consultas sobre privacidad, ejercicio de derechos ARCO o incidentes de seguridad:</p>
+      <ul>
+        <li><strong>Email:</strong> mario@delamorazumaran.com</li>
+        <li><strong>Plataforma:</strong> dmzkitchensupport.github.io</li>
+        <li><strong>Empresa:</strong> De La Mora Zumarán Kitchen Support · Puebla, México</li>
+      </ul>
+      <p>DMZ Kitchen Support se reserva el derecho de actualizar esta política. Cualquier cambio material se notificará con al menos <strong>15 días naturales de anticipación</strong> al correo registrado.</p>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 <strong>De La Mora Zumarán Kitchen Support</strong> · DMZ Audit · Todos los derechos reservados · Puebla, México</p>
+  <p style="margin-top:6px">Versión 1.0 · Mayo 2026 · LFPDPPP · <a href="/contrato.html">Contrato de servicio</a></p>
+</footer>
+
+<script>
+// TOC active state
+const sections = document.querySelectorAll('.doc-section');
+const links    = document.querySelectorAll('.toc-list a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+  links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + current));
+});
+</script>
+</body>
+</html>

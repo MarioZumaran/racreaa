@@ -431,7 +431,7 @@ body {
       </div>
 
       <div class="form-footer">
-        DMZ Audit &mdash; Plataforma segura &mdash; TLS 1.3
+        DMZ Audit &mdash; Plataforma segura &mdash; TLS 1.3 &mdash; <a href='/privacidad.html' style='color:var(--gold);text-decoration:none;'>Privacidad</a> &mdash; <a href='/contrato.html' style='color:var(--gold);text-decoration:none;'>Contrato</a>
       </div>
 
     </div>
@@ -453,7 +453,7 @@ document.addEventListener('contextmenu', e => e.preventDefault());
   document.getElementById('f-tenant').value = slug;
 
   // Precargar branding del tenant
-  fetch(`/api/tenant/${encodeURIComponent(slug)}/branding`)
+  fetch(`https://dmz-audit.netlify.app/api/tenant-branding?slug=${encodeURIComponent(slug)}`)
     .then(r => r.ok ? r.json() : null)
     .then(data => {
       if (!data) return;
@@ -542,7 +542,7 @@ async function doLogin() {
   };
 
   try {
-    const res  = await fetch('/api/auth-login', {
+    const res  = await fetch('https://dmz-audit.netlify.app/api/auth-login', {
       method:      'POST',
       headers:     { 'Content-Type': 'application/json', 'X-Request-ID': 'REQ-' + Date.now().toString(36).toUpperCase() },
       body:        JSON.stringify(body),
@@ -562,8 +562,14 @@ async function doLogin() {
 
       // Redirigir al módulo principal
       setTimeout(() => {
-        const redirect = new URLSearchParams(window.location.search).get('redirect') || '/audit';
-        window.location.href = redirect + `?tenant=${data.tenant.slug}`;
+        const role = data.operator.role;
+        if (data.must_change_password) {
+          window.location.href = '/set-password?token=change&email=' + encodeURIComponent(data.operator.email);
+        } else if (role === 'admin' || role === 'supervisor') {
+          window.location.href = '/dashboard.html';
+        } else {
+          window.location.href = '/app.html';
+        }
       }, 800);
 
     } else if (res.status === 429) {
@@ -616,7 +622,7 @@ document.addEventListener('keydown', e => {
 (function initTelemetry() {
   const BATCH_MS   = 3000;   // enviar batch cada 3 segundos
   const MAX_QUEUE  = 50;     // máximo de eventos en cola
-  const ENDPOINT   = '/api/telemetry';
+  const ENDPOINT   = 'https://dmz-audit.netlify.app/api/telemetry';
 
   let queue        = [];
   let batchTimer   = null;
