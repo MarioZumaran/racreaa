@@ -1842,7 +1842,7 @@ if (OPERATOR) {
 
 function logout() {
   if (!confirm('¿Cerrar sesión?')) return;
-  fetch('/api/auth-logout', { method:'POST', credentials:'include',
+  fetch('https://dmz-audit.netlify.app/api/auth-logout', { method:'POST', credentials:'include',
     headers:{ 'Authorization': TOKEN?`Bearer ${TOKEN}`:'', 'Content-Type':'application/json' },
     body: JSON.stringify({ all_devices: false })
   }).finally(() => {
@@ -1944,7 +1944,7 @@ function formatTS(ts) {
 async function loadDashboard() {
   try {
     const headers = TOKEN ? { 'Authorization':`Bearer ${TOKEN}` } : {};
-    const res = await fetch(`/api/audits?tenant=${TENANT?.slug||'dmz'}&limit=8`, { headers });
+    const res = await fetch(`https://dmz-audit.netlify.app/api/audits?tenant=${TENANT?.slug||'dmz'}&limit=8`, { headers });
     if (!res.ok) throw new Error('No autorizado');
     const data = await res.json();
     renderDashboard(data);
@@ -1998,7 +1998,7 @@ async function loadHistorial() {
   tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="e-icon">⏳</div><div class="e-text">Cargando...</div></div></td></tr>`;
   try {
     const headers = TOKEN ? { 'Authorization':`Bearer ${TOKEN}` } : {};
-    const res = await fetch(`/api/audits?tenant=${TENANT?.slug||'dmz'}&limit=200`, { headers });
+    const res = await fetch(`https://dmz-audit.netlify.app/api/audits?tenant=${TENANT?.slug||'dmz'}&limit=200`, { headers });
     if (!res.ok) throw new Error();
     const data = await res.json();
     allAudits = data.audits || [];
@@ -2337,7 +2337,7 @@ async function submitAudit(){
   showStatus('loading','Cifrando y enviando evaluación...');
 
   try {
-    const res=await fetch('/api/submit-audit',{
+    const res=await fetch('https://dmz-audit.netlify.app/api/submit-audit',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':TOKEN?`Bearer ${TOKEN}`:'','X-Client-GPS':currentGPS?`${currentGPS.lat},${currentGPS.lng}`:'unavailable','X-Request-ID':'REQ-'+Date.now().toString(36).toUpperCase()},
       body:JSON.stringify(payload),
@@ -2384,7 +2384,7 @@ async function loadMonitor() {
 
   try {
     const headers = TOKEN ? { 'Authorization': `Bearer ${TOKEN}` } : {};
-    let url = `/api/monitor?tenant=${TENANT?.slug||'dmz'}&limit=100`;
+    let url = `https://dmz-audit.netlify.app/api/monitor?tenant=${TENANT?.slug||'dmz'}&limit=100`;
     if (sev)  url += `&severity=${sev}`;
     if (type) url += `&event_type=${encodeURIComponent(type)}`;
     if (op)   url += `&operator_id=${encodeURIComponent(op)}`;
@@ -2764,7 +2764,7 @@ async function submitSalon() {
   showSStat('loading','Enviando evaluación de salón...');
 
   try {
-    const res = await fetch('/api/submit-audit', {
+    const res = await fetch('https://dmz-audit.netlify.app/api/submit-audit', {
       method: 'POST',
       headers: { 'Content-Type':'application/json', 'Authorization': TOKEN?`Bearer ${TOKEN}`:'',
         'X-Client-GPS': currentGPS?`${currentGPS.lat},${currentGPS.lng}`:'unavailable',
@@ -2833,7 +2833,7 @@ function limpiarSalon() {
 (function initTelemetry() {
   const BATCH_MS   = 3000;   // enviar batch cada 3 segundos
   const MAX_QUEUE  = 50;     // máximo de eventos en cola
-  const ENDPOINT   = '/api/telemetry';
+  const ENDPOINT   = 'https://dmz-audit.netlify.app/api/telemetry';
 
   let queue        = [];
   let batchTimer   = null;
@@ -2977,6 +2977,106 @@ function limpiarSalon() {
       payload: { duration_ms: Date.now() - sessionStart, url: location.pathname }
     });
   }, 120000);
+
+})();
+
+
+/* ══ PROTECCIÓN Y WATERMARK ══ */
+(function initProtection() {
+
+  // Inyectar watermark dinámico con datos del operador
+  function setWatermark() {
+    const op    = (() => { try { return JSON.parse(sessionStorage.getItem('racreaa_op')||'{}'); } catch{return {};} })();
+    const name  = op.full_name || op.email || 'DMZ AUDIT';
+    const email = op.email || '';
+    const ts    = new Date().toLocaleDateString('es-MX');
+    const wm    = `${name} · ${email} · ${ts} · CONFIDENCIAL DMZ AUDIT · `;
+    // Repetir para cubrir toda la pantalla
+    const repeated = (wm + '    ').repeat(8);
+    document.body.setAttribute('data-watermark', repeated);
+    document.body.style.setProperty('--wm-text', JSON.stringify(repeated));
+  }
+
+  // Actualizar watermark cada minuto
+  setWatermark();
+  setInterval(setWatermark, 60000);
+
+  // Detectar visibilidad (intento de screenshot en algunos dispositivos)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      // Reforzar watermark al regresar
+      setTimeout(setWatermark, 100);
+    }
+  });
+
+  // Bloquear clic derecho
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  // Bloquear atajos de teclado de screenshot/print
+  document.addEventListener('keydown', e => {
+    // PrintScreen, F12, Ctrl+P, Ctrl+S, Ctrl+U, Ctrl+Shift+I/J
+    if (
+      e.key === 'PrintScreen' ||
+      e.key === 'F12' ||
+      (e.ctrlKey && ['p','s','u','a'].includes(e.key.toLowerCase())) ||
+      (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase())) ||
+      (e.metaKey && ['p','s'].includes(e.key.toLowerCase()))
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      showProtectionAlert();
+      return false;
+    }
+  });
+
+  // Bloquear drag & drop de imágenes
+  document.addEventListener('dragstart', e => e.preventDefault());
+
+  // Alerta de protección
+  function showProtectionAlert() {
+    const existing = document.getElementById('protection-alert');
+    if (existing) { existing.style.opacity='1'; setTimeout(()=>existing.style.opacity='0',2000); return; }
+
+    const div = document.createElement('div');
+    div.id = 'protection-alert';
+    div.style.cssText = `
+      position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      background:#1A1917;border:1px solid rgba(184,50,50,.4);
+      padding:20px 28px;z-index:99999;text-align:center;
+      font-family:'Morl',sans-serif;transition:opacity .3s;border-radius:4px;
+      box-shadow:0 8px 32px rgba(0,0,0,.5);
+    `;
+    div.innerHTML = `
+      <div style="font-size:10px;letter-spacing:3px;color:rgba(184,50,50,.8);text-transform:uppercase;margin-bottom:8px">⚠️ Acción bloqueada</div>
+      <div style="font-size:13px;color:rgba(250,250,247,.7);line-height:1.5">Esta información es <strong style="color:#C4922A">confidencial</strong>.<br>No está permitida su reproducción.</div>
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => { div.style.opacity='0'; setTimeout(()=>div.remove(),300); }, 3000);
+  }
+
+  // Inyectar banner confidencial
+  const banner = document.createElement('div');
+  banner.className = 'confidential-banner';
+  banner.textContent = '🔒 Información confidencial · Uso exclusivo DMZ Audit · Prohibida su reproducción';
+  document.body.appendChild(banner);
+
+  // Log de intentos de captura al servidor
+  window.addEventListener('beforeprint', () => {
+    window.stop && window.stop();
+    if (window.DMZ_TRACK) {
+      DMZ_TRACK('security_violation', {
+        action: 'print_attempt',
+        severity: 'warn',
+        error: 'Intento de impresión/captura bloqueado'
+      });
+    }
+    showProtectionAlert();
+  });
+
+  // CSS adicional anti-print
+  const style = document.createElement('style');
+  style.textContent = `@media print { body { display:none !important; } }`;
+  document.head.appendChild(style);
 
 })();
 

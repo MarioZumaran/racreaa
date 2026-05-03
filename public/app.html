@@ -658,6 +658,91 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
 }
 @keyframes spin { to{transform:rotate(360deg)} }
 
+/* ══ PROTECCIÓN DE DATOS ══ */
+
+/* Watermark dinámico sobre toda la app */
+body::after {
+  content: attr(data-watermark);
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Morl', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(196,146,42,0.07);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 120px,
+    rgba(196,146,42,0.03) 120px,
+    rgba(196,146,42,0.03) 121px
+  );
+  white-space: pre;
+  word-break: break-all;
+  overflow: hidden;
+  text-align: center;
+  line-height: 4;
+}
+
+/* Bloquear selección de texto en elementos no-input */
+.main-area, .topbar, .bottom-nav {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+/* Aviso confidencial */
+.confidential-banner {
+  background: rgba(184,50,50,0.08);
+  border-bottom: 1px solid rgba(184,50,50,0.2);
+  padding: 4px 16px;
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(184,50,50,0.7);
+  text-transform: uppercase;
+  font-family: 'Morl', sans-serif;
+  position: fixed;
+  top: calc(54px + var(--safe-top) + 20px);
+  left: 0; right: 0;
+  z-index: 250;
+}
+
+
+/* ── BOTÓN REPORTE WA ── */
+.btn-report-wa {
+  position: fixed;
+  bottom: calc(72px + var(--safe-bot) + 10px);
+  left: 16px;
+  background: #25D366;
+  border: none;
+  border-radius: 28px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 12px rgba(0,0,0,.2);
+  cursor: pointer;
+  z-index: 200;
+  touch-action: manipulation;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+.btn-report-wa.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+.btn-report-wa svg { width:24px; height:24px; fill:#fff; }
+
+
 /* Semáforo */
 .semaforo-m { display:flex; gap:6px; justify-content:center; margin:8px 0; }
 .sem-m { width:12px; height:12px; border-radius:50%; opacity:.2; transition:opacity .3s; }
@@ -874,6 +959,10 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
 
     <div class="field" style="margin-top:14px;">
       <label class="field-label">Conclusión y dictamen</label>
+      <div id="sheet-justif-alert" style="display:none;background:#FAEAEA;border:1px solid #B83232;padding:10px 12px;margin-bottom:8px;border-radius:2px;">
+        <div style="font-size:12px;font-weight:700;color:#B83232;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">⚠️ Score menor a 60 — Justificación obligatoria</div>
+        <div style="font-size:11px;color:#5C2020;line-height:1.5;">Debes explicar las causas específicas que originaron esta calificación antes de enviar.</div>
+      </div>
       <textarea class="field-input" id="sheet-concl" style="height:80px;resize:none;-webkit-user-select:text;user-select:text;" placeholder="Observaciones finales, recomendaciones clave..."></textarea>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
@@ -898,6 +987,15 @@ body { background:var(--bg); font-family:'Morl',sans-serif; color:var(--text); f
     <button class="btn-secondary" onclick="closeSheetDirect()">Cancelar</button>
   </div>
 </div>
+
+
+<!-- BOTÓN REPORTE WA -->
+<button class="btn-report-wa" id="btn-report-wa" onclick="reportarErrorWA()" title="Reportar error a soporte DMZ">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.86L0 24l6.335-1.518A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.003-1.366l-.36-.214-3.727.893.924-3.638-.234-.373A9.818 9.818 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
+  </svg>
+</button>
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav" id="bottom-nav">
@@ -1001,7 +1099,7 @@ function getNivel(s){ return NMAP[getNKey(s)]; }
 /* ── LOAD HOME ── */
 async function loadHome() {
   try {
-    const res = await fetch(`/api/audits?tenant=${TENANT.slug}&limit=5`, { headers:{ 'Authorization':`Bearer ${TOKEN}` } });
+    const res = await fetch(`https://dmz-audit.netlify.app/api/audits?tenant=${TENANT.slug}&limit=5`, { headers:{ 'Authorization':`Bearer ${TOKEN}` } });
     const data = await res.json();
     const audits = data.audits || [];
     document.getElementById('h-total').textContent = data.total || 0;
@@ -1036,7 +1134,7 @@ async function loadHist() {
   const el = document.getElementById('hist-list');
   el.innerHTML = '<div class="spinner-m"></div>';
   try {
-    const res = await fetch(`/api/audits?tenant=${TENANT.slug}&limit=50`, { headers:{ 'Authorization':`Bearer ${TOKEN}` } });
+    const res = await fetch(`https://dmz-audit.netlify.app/api/audits?tenant=${TENANT.slug}&limit=50`, { headers:{ 'Authorization':`Bearer ${TOKEN}` } });
     const data = await res.json();
     const audits = data.audits || [];
     if (!audits.length) { el.innerHTML = '<div style="text-align:center;color:var(--text3);padding:32px;font-size:12px;">Sin evaluaciones registradas.</div>'; return; }
@@ -1295,6 +1393,15 @@ function openSheet() {
       </div>
     </div>`;
 
+  // Mostrar alerta si score < 60
+  const alertEl = document.getElementById('sheet-justif-alert');
+  if (alertEl) alertEl.style.display = avg < 60 ? 'block' : 'none';
+  if (avg < 60) {
+    document.getElementById('sheet-concl').placeholder = 'REQUERIDO: Explica las causas específicas de la calificación baja...';
+  } else {
+    document.getElementById('sheet-concl').placeholder = 'Observaciones finales, recomendaciones clave...';
+  }
+
   document.getElementById('sheet-overlay').classList.add('open');
   initSheetSig();
 }
@@ -1303,6 +1410,13 @@ function openSalonSheet() {
   sheetType = 'salon';
   document.getElementById('sheet-title').textContent = 'Enviar Evaluación · Salón';
   const avg = calcSalonAvg();
+  const alertElS = document.getElementById('sheet-justif-alert');
+  if (alertElS) alertElS.style.display = avg < 60 ? 'block' : 'none';
+  if (avg < 60) {
+    document.getElementById('sheet-concl').placeholder = 'REQUERIDO: Explica las causas específicas de la calificación baja...';
+  } else {
+    document.getElementById('sheet-concl').placeholder = 'Observaciones finales, recomendaciones clave...';
+  }
   const nk = getNKey(avg); const nm = NMAP[nk];
   document.getElementById('sheet-summary').innerHTML = `
     <div style="display:flex;align-items:center;gap:14px;background:${nm.lt};border:1px solid ${nm.hex};padding:14px;margin-bottom:4px;">
@@ -1352,6 +1466,29 @@ async function submitFromSheet() {
   const auditor = document.getElementById('sheet-fa').value.trim();
   if (!auditor) { showSheetStatus('error','Ingresa el nombre del auditor.'); return; }
 
+  // Validar justificación si score < 60
+  const evCards   = sheetType === 'alimentos' ? cardsM.filter(c=>c._pct!==undefined) : null;
+  const avgScore  = sheetType === 'alimentos'
+    ? Math.round(evCards.reduce((a,c)=>a+c._pct,0)/evCards.length)
+    : calcSalonAvg();
+  const conclusion = document.getElementById('sheet-concl').value.trim();
+
+  if (avgScore < 60) {
+    const alert = document.getElementById('sheet-justif-alert');
+    if (alert) alert.style.display = 'block';
+    if (!conclusion || conclusion.length < 20) {
+      showSheetStatus('error', '⚠️ Score ' + avgScore + '/100 — Debes justificar las causas (mínimo 20 caracteres).');
+      document.getElementById('sheet-concl').focus();
+      document.getElementById('sheet-concl').style.borderColor = '#B83232';
+      document.getElementById('sheet-concl').placeholder = 'REQUERIDO: Explica las causas de la calificación baja...';
+      return;
+    }
+    document.getElementById('sheet-concl').style.borderColor = '';
+  } else {
+    const alert = document.getElementById('sheet-justif-alert');
+    if (alert) alert.style.display = 'none';
+  }
+
   btn.disabled = true;
   showSheetStatus('loading', 'Enviando evaluación...');
 
@@ -1398,7 +1535,7 @@ async function submitFromSheet() {
   }
 
   try {
-    const res = await fetch('/api/submit-audit', {
+    const res = await fetch('https://dmz-audit.netlify.app/api/submit-audit', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${TOKEN}`,
         'X-Client-GPS':GPS?`${GPS.lat},${GPS.lng}`:'unavailable',
@@ -1409,6 +1546,10 @@ async function submitFromSheet() {
     const result = await res.json();
     if (res.ok && result.success) {
       showSheetStatus('success', `✅ Enviada — ${result.auditId}`);
+
+      // Enviar reporte WA al administrador
+      enviarReporteWA(payload, result.auditId, avgScore);
+
       setTimeout(() => {
         closeSheetDirect();
         if (sheetType==='alimentos') { cardsM=[]; counterM=0; document.getElementById('cards-col-m').innerHTML=''; updateFAB(); }
@@ -1535,8 +1676,105 @@ function tickTimerM(){
 /* ── LOGOUT ── */
 function logout(){
   if(!confirm('¿Cerrar sesión?'))return;
-  fetch('/api/auth-logout',{method:'POST',credentials:'include',headers:{'Authorization':`Bearer ${TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({all_devices:false})})
+  fetch('https://dmz-audit.netlify.app/api/auth-logout',{method:'POST',credentials:'include',headers:{'Authorization':`Bearer ${TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({all_devices:false})})
     .finally(()=>{sessionStorage.clear();window.location.href='/login.html';});
+}
+
+
+
+/* ── REPORTE AUTOMÁTICO WA AL ENVIAR EVALUACIÓN ── */
+function enviarReporteWA(payload, auditId, score) {
+  try {
+    const op      = OPERATOR || {};
+    const nivel   = score >= 85 ? '🟢 EXCELENTE' : score >= 70 ? '🟡 BUENO' : score >= 55 ? '🟠 REGULAR' : score >= 40 ? '🔴 DEFICIENTE' : '🚨 CRÍTICO';
+    const tipo    = (payload.tipo || 'alimentos').toUpperCase();
+    const items   = payload.items || [];
+    const time    = new Date().toLocaleString('es-MX', {timeZone:'America/Mexico_City'});
+
+    // Construir detalle de items
+    const itemLines = items.map(it => {
+      const niv = it.score >= 85 ? '🟢' : it.score >= 70 ? '🟡' : it.score >= 55 ? '🟠' : '🔴';
+      return `  ${niv} ${it.nombre}: ${it.score}/100${it.observaciones ? ' — ' + it.observaciones.slice(0,40) : ''}`;
+    }).join('\n');
+
+    const msg = [
+      `📋 *EVALUACIÓN DMZ AUDIT*`,
+      `${nivel} — ${score}/100`,
+      ``,
+      `🏢 *${payload.establecimiento || '—'}*`,
+      `👤 Auditor: ${op.full_name || payload.auditor || '—'}`,
+      `📅 Fecha: ${payload.fecha || '—'} · ${payload.servicio || '—'}`,
+      `🔖 Tipo: ${tipo}`,
+      ``,
+      `*Detalle:*`,
+      itemLines,
+      ``,
+      payload.conclusion ? `💬 *Dictamen:* ${payload.conclusion.slice(0,150)}` : '',
+      ``,
+      `🆔 ID: ${auditId}`,
+      `🕐 ${time}`,
+      `_DMZ Audit · dmzkitchensupport.com_`
+    ].filter(l => l !== undefined).join('\n');
+
+    const waURL = 'https://wa.me/522223623135?text=' + encodeURIComponent(msg);
+
+    // Abrir WA automáticamente
+    window.open(waURL, '_blank');
+
+  } catch(e) {
+    console.warn('WA report error:', e);
+  }
+}
+
+/* ── REPORTE DE ERROR POR WHATSAPP ── */
+let lastError = null;
+let errorCount = 0;
+
+// Interceptar errores y mostrar botón WA
+window.addEventListener('error', (e) => {
+  lastError = { type:'JS Error', msg: e.message, file: e.filename, line: e.lineno, time: new Date().toISOString() };
+  showReportBtn();
+});
+
+window.addEventListener('unhandledrejection', (e) => {
+  lastError = { type:'Promise Error', msg: String(e.reason), time: new Date().toISOString() };
+  showReportBtn();
+});
+
+// También exponer función para errores manuales
+window.DMZ_REPORT_ERROR = function(msg, context) {
+  lastError = { type:'App Error', msg, context, time: new Date().toISOString() };
+  showReportBtn();
+};
+
+function showReportBtn() {
+  errorCount++;
+  const btn = document.getElementById('btn-report-wa');
+  if (btn) btn.classList.add('visible');
+}
+
+function reportarErrorWA() {
+  const op   = OPERATOR || {};
+  const time = new Date().toLocaleString('es-MX');
+  const err  = lastError || { type: 'Reporte manual', msg: 'El usuario reporta un problema', time };
+  
+  const msg = [
+    '🔴 *ERROR DMZ AUDIT*',
+    '',
+    `👤 Operador: ${op.full_name || '—'} (${op.role || '—'})`,
+    `📧 Email: ${op.email || '—'}`,
+    `🕐 Hora: ${time}`,
+    `📱 Vista: ${window.DMZ_CURRENT_VIEW || '—'}`,
+    '',
+    `⚠️ Tipo: ${err.type}`,
+    `📋 Error: ${err.msg}`.slice(0, 200),
+    `🌐 URL: ${location.href}`,
+    '',
+    '_Enviado desde DMZ Audit App_'
+  ].join('\n');
+
+  const waURL = 'https://wa.me/522223623135?text=' + encodeURIComponent(msg);
+  window.open(waURL, '_blank');
 }
 
 /* ── INIT ── */
@@ -1553,7 +1791,7 @@ loadHome();
 (function initTelemetry() {
   const BATCH_MS   = 3000;   // enviar batch cada 3 segundos
   const MAX_QUEUE  = 50;     // máximo de eventos en cola
-  const ENDPOINT   = '/api/telemetry';
+  const ENDPOINT   = 'https://dmz-audit.netlify.app/api/telemetry';
 
   let queue        = [];
   let batchTimer   = null;
@@ -1697,6 +1935,106 @@ loadHome();
       payload: { duration_ms: Date.now() - sessionStart, url: location.pathname }
     });
   }, 120000);
+
+})();
+
+
+/* ══ PROTECCIÓN Y WATERMARK ══ */
+(function initProtection() {
+
+  // Inyectar watermark dinámico con datos del operador
+  function setWatermark() {
+    const op    = (() => { try { return JSON.parse(sessionStorage.getItem('racreaa_op')||'{}'); } catch{return {};} })();
+    const name  = op.full_name || op.email || 'DMZ AUDIT';
+    const email = op.email || '';
+    const ts    = new Date().toLocaleDateString('es-MX');
+    const wm    = `${name} · ${email} · ${ts} · CONFIDENCIAL DMZ AUDIT · `;
+    // Repetir para cubrir toda la pantalla
+    const repeated = (wm + '    ').repeat(8);
+    document.body.setAttribute('data-watermark', repeated);
+    document.body.style.setProperty('--wm-text', JSON.stringify(repeated));
+  }
+
+  // Actualizar watermark cada minuto
+  setWatermark();
+  setInterval(setWatermark, 60000);
+
+  // Detectar visibilidad (intento de screenshot en algunos dispositivos)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      // Reforzar watermark al regresar
+      setTimeout(setWatermark, 100);
+    }
+  });
+
+  // Bloquear clic derecho
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  // Bloquear atajos de teclado de screenshot/print
+  document.addEventListener('keydown', e => {
+    // PrintScreen, F12, Ctrl+P, Ctrl+S, Ctrl+U, Ctrl+Shift+I/J
+    if (
+      e.key === 'PrintScreen' ||
+      e.key === 'F12' ||
+      (e.ctrlKey && ['p','s','u','a'].includes(e.key.toLowerCase())) ||
+      (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase())) ||
+      (e.metaKey && ['p','s'].includes(e.key.toLowerCase()))
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      showProtectionAlert();
+      return false;
+    }
+  });
+
+  // Bloquear drag & drop de imágenes
+  document.addEventListener('dragstart', e => e.preventDefault());
+
+  // Alerta de protección
+  function showProtectionAlert() {
+    const existing = document.getElementById('protection-alert');
+    if (existing) { existing.style.opacity='1'; setTimeout(()=>existing.style.opacity='0',2000); return; }
+
+    const div = document.createElement('div');
+    div.id = 'protection-alert';
+    div.style.cssText = `
+      position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      background:#1A1917;border:1px solid rgba(184,50,50,.4);
+      padding:20px 28px;z-index:99999;text-align:center;
+      font-family:'Morl',sans-serif;transition:opacity .3s;border-radius:4px;
+      box-shadow:0 8px 32px rgba(0,0,0,.5);
+    `;
+    div.innerHTML = `
+      <div style="font-size:10px;letter-spacing:3px;color:rgba(184,50,50,.8);text-transform:uppercase;margin-bottom:8px">⚠️ Acción bloqueada</div>
+      <div style="font-size:13px;color:rgba(250,250,247,.7);line-height:1.5">Esta información es <strong style="color:#C4922A">confidencial</strong>.<br>No está permitida su reproducción.</div>
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => { div.style.opacity='0'; setTimeout(()=>div.remove(),300); }, 3000);
+  }
+
+  // Inyectar banner confidencial
+  const banner = document.createElement('div');
+  banner.className = 'confidential-banner';
+  banner.textContent = '🔒 Información confidencial · Uso exclusivo DMZ Audit · Prohibida su reproducción';
+  document.body.appendChild(banner);
+
+  // Log de intentos de captura al servidor
+  window.addEventListener('beforeprint', () => {
+    window.stop && window.stop();
+    if (window.DMZ_TRACK) {
+      DMZ_TRACK('security_violation', {
+        action: 'print_attempt',
+        severity: 'warn',
+        error: 'Intento de impresión/captura bloqueado'
+      });
+    }
+    showProtectionAlert();
+  });
+
+  // CSS adicional anti-print
+  const style = document.createElement('style');
+  style.textContent = `@media print { body { display:none !important; } }`;
+  document.head.appendChild(style);
 
 })();
 
