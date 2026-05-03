@@ -1,14 +1,14 @@
 /**
- * migrate-session.js — ONE-TIME migration: creates audit_sessions table
- * Call once: GET /api/migrate-session?token=DMZracreaa2026!
- * Remove after execution.
+ * migrate-session.js — ONE-TIME DB migration wrapper
+ * GET /api/migrate-session?token=DMZracreaa2026!
  */
 const { Pool } = require('pg');
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl:{ rejectUnauthorized:true } });
+const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: true } });
 
-module.exports = async function handler(req, res) {
-  if (req.query.token !== 'DMZracreaa2026!') return res.status(403).json({ error: 'Forbidden' });
-
+exports.handler = async (event) => {
+  if (event.queryStringParameters?.token !== 'DMZracreaa2026!') {
+    return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
+  }
   const client = await pool.connect();
   try {
     await client.query(`
@@ -30,9 +30,9 @@ module.exports = async function handler(req, res) {
       CREATE INDEX IF NOT EXISTS idx_audit_sessions_tenant ON racreaa.audit_sessions(tenant_id);
       CREATE INDEX IF NOT EXISTS idx_audit_sessions_status ON racreaa.audit_sessions(status);
     `);
-    res.status(200).json({ ok: true, message: 'audit_sessions created' });
-  } catch(e) {
-    res.status(500).json({ error: e.message });
+    return { statusCode: 200, body: JSON.stringify({ ok: true, message: 'audit_sessions created' }) };
+  } catch (e) {
+    return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
   } finally {
     client.release();
   }
