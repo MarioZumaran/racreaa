@@ -2,6 +2,7 @@ const handler_module = require('./monitor_impl');
 
 const CORS_ORIGINS = [
   'https://mariozumaran.github.io',
+  'https://dmzkitchensupport.github.io',
   'https://dmz-audit.netlify.app',
   'https://racreaa.vercel.app',
   ...(process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean)
